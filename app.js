@@ -13,6 +13,8 @@ var app = express();
 
 // all environments
 app.set('port', 7654);
+app.set('hostname', '131.175.141.249');
+app.set('externalUrl', '131.175.141.249');
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
