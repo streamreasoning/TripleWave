@@ -43,11 +43,11 @@ app.get('/TripleRush/wiki.json', function(req, res) {
 
 });
 
-app.get('/sGraph', function(req, res) {
+app.get('/TripleRush/sGraph', function(req, res) {
   return res.json(server.cache.getAll());
 });
 
-app.get('/:ts', function(req, res) {
+app.get('/TripleRush/:ts', function(req, res) {
   console.log('Searching element with ts ' + req.params.ts);
 
   var element = server.cache.find(req.params.ts);
