@@ -12,7 +12,7 @@ var bodyParser = require('body-parser');
 var app = express();
 
 // all environments
-app.set('port', 7654);
+app.set('port', 80);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
@@ -45,7 +45,7 @@ if ('development' == app.get('env')) {
   app.use(errorhandler());
 }
 
-app.listen(app.get('port'), '0.0.0.0', function() {
+app.listen(app.get('port'), function() {
   console.log('Filter server listening on port ' + app.get('port'));
   activeStream = new WikiStream();
 });
