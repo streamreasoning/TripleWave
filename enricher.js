@@ -10,25 +10,11 @@ function EnrichStream(options) {
     return new EnrichStream(options);
   }
 
-
-
   // init Transform
   Transform.call(this, options);
 }
 util.inherits(EnrichStream, Transform);
 
-/*var context = {
-  "generatedAt": {
-    "@id": "http://www.w3.org/ns/prov#generatedAtTime",
-    "@type": "http://www.w3.org/2001/XMLSchema#date"
-  },
-  "name": "https://schema.org/name",
-  "relatedLink": "https://schema.org/relatedLink",
-  "contributor": "https://schema.org/contributor",
-  "text": "https://schema.org/text",
-  "isPartOf": "https://schema.org/isPartOf",
-  "character": "https://schema.org/character"
-};*/
 
 var context = "https://schema.org/";
 
@@ -166,33 +152,16 @@ var enrich = function(change) {
   result["@graph"] = graph;
   result["@context"] = context;
 
-  /* delete change.userUrl;
-  delete change.user;
-  delete change.robot;
-  delete change.page;
-  delete change.pageUrl;
-  delete change.wikipediaUrl;
-  delete change.wikipediaLong;
-  delete change.wikipediaShort;
-  delete change.wikipedia;
-  delete change.comment;
-  delete change.newPage;
-  delete change.url;
-  delete change.delta;
-  delete change.flag;
-  delete change.namespace;
-  delete change.channel;
-  delete change.unpatrolled;
-  delete change.anonymous;
-*/
+
+
   return result;
 };
 
 EnrichStream.prototype._transform = function(chunk, enc, cb) {
 
-  console.log(chunk.toString());
   var change = JSON.parse(chunk.toString());
   change = enrich(change);
+
   this.push(JSON.stringify(change));
   cb();
 };

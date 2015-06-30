@@ -4,6 +4,8 @@
 
 var WikiStream = require("./wikiStream.js");
 var Enricher = require("./enricher.js");
+var Cache = require("./cache.js");
+
 var express = require('express');
 var http = require('http');
 var path = require('path');
@@ -24,25 +26,40 @@ app.use(bodyParser.json());
 //app.use(express.static(path.join(__dirname, 'public')));
 
 // development only
+var server = {
+
+};
+
 app.get('/TripleRush/wiki.json', function(req, res) {
 
-  var activeStream;
-  activeStream = new WikiStream();
   console.log('Connection');
-  var enricher = new Enricher();
 
-  enricher.on('unpipe', function() {
-    console.log('Enricher unpipe');
-    this.end();
-  });
-
-  activeStream.pipe(enricher).pipe(res);
+  server.enricher.pipe(res);
 
   res.on('close', function() {
-    activeStream.closeStream();
-    activeStream.unpipe();
-    activeStream = null;
+    enricher.unpipe(res);
   });
+
+
+});
+
+app.get('/sGraph', function(req, res) {
+  return res.json(server.cache.getAll());
+});
+
+app.get('/:ts', function(req, res) {
+  console.log('Searching element with ts ' + req.params.ts);
+
+  var element = server.cache.find(req.params.ts);
+
+  if (element) {
+    res.json(element);
+  } else {
+    res.status = 404;
+    res.json({
+      error: "Element not found"
+    });
+  }
 });
 
 
@@ -51,5 +68,12 @@ if ('development' == app.get('env')) {
 }
 
 app.listen(app.get('port'), function() {
+
+  server.cache = new Cache({});
+  server.enricher = new Enricher(server);
+  server.activeStream = new WikiStream();
+  server.activeStream.pipe(server.enricher);
+  server.enricher.pipe(server.cache);
+
   console.log('Filter server listening on port ' + app.get('port'));
 });
