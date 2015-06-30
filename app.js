@@ -35,6 +35,12 @@ app.get('/wiki.json', function(req, res) {
   activeStream.pipe(enricher).pipe(res);
 });
 
+app.get('/',function(req,res){
+  console.log('test');
+  res.json({
+    test:ok
+  });
+})
 if ('development' == app.get('env')) {
   app.use(errorhandler());
 }
