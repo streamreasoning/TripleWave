@@ -4,7 +4,6 @@
 
 var WikiStream = require("./wikiStream.js");
 var Enricher = require("./enricher.js");
-var DevNull = require("./devnull.js");
 var express = require('express');
 var http = require('http');
 var path = require('path');
@@ -13,7 +12,7 @@ var bodyParser = require('body-parser');
 var app = express();
 
 // all environments
-app.set('port', 8080);
+app.set('port', 7654);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
