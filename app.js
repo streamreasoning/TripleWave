@@ -36,7 +36,6 @@ app.get('/wiki.json', function(req, res) {
   enricher.on('unpipe', function() {
     console.log('Enricher unpipe');
     this.end();
-    //activeStream.end();
   });
 
   activeStream.pipe(enricher).pipe(res);
