@@ -12,7 +12,7 @@ var bodyParser = require('body-parser');
 var app = express();
 
 // all environments
-app.set('port', 80);
+app.set('port', 7654);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
@@ -24,9 +24,7 @@ app.use(bodyParser.json());
 //app.use(express.static(path.join(__dirname, 'public')));
 
 // development only
-
-
-app.get('/wiki.json', function(req, res) {
+app.get('/TripleRush/wiki.json', function(req, res) {
 
   var activeStream;
   activeStream = new WikiStream();
@@ -47,12 +45,6 @@ app.get('/wiki.json', function(req, res) {
   });
 });
 
-app.get('/', function(req, res) {
-  console.log('test');
-  res.json({
-    test: ok
-  });
-});
 
 if ('development' == app.get('env')) {
   app.use(errorhandler());
