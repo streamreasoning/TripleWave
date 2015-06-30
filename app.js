@@ -59,6 +59,6 @@ if ('development' == app.get('env')) {
   app.use(errorhandler());
 }
 
-app.listen(app.get('port'), '0.0.0.0', function() {
+app.listen(app.get('port'), function() {
   console.log('Filter server listening on port ' + app.get('port'));
 });
