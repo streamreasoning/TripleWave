@@ -21,31 +21,31 @@ app.set('view engine', 'ejs');
 app.use(bodyParser.json());
 //app.use(express.urlencoded());
 //app.use(express.methodOverride());
-//app.use(app.router);
 //app.use(express.static(path.join(__dirname, 'public')));
 
 // development only
 
-var activeStream;
 
 app.get('/wiki.json', function(req, res) {
 
+  var activeStream;
+  activeStream = new WikiStream();
   console.log('Connection');
   var enricher = new Enricher();
   activeStream.pipe(enricher).pipe(res);
 });
 
-app.get('/',function(req,res){
+app.get('/', function(req, res) {
   console.log('test');
   res.json({
-    test:ok
+    test: ok
   });
-})
+});
+
 if ('development' == app.get('env')) {
   app.use(errorhandler());
 }
 
 app.listen(app.get('port'), function() {
   console.log('Filter server listening on port ' + app.get('port'));
-  activeStream = new WikiStream();
 });
