@@ -114,7 +114,7 @@ var enrich = function(change) {
 
     if (change.newPage) {
       action = {
-        '@id': 'http://example.com/action/' + timestamp.getTime(),
+        '@id': 'http://131.175.141.249/TripleRush/action/' + timestamp.getTime(),
         '@type': 'https://schema.org/CreateAction',
         'result': {
           "@id": page['@id']
@@ -125,7 +125,7 @@ var enrich = function(change) {
       };
     } else {
       action = {
-        '@id': 'http://example.com/action/' + timestamp.getTime(),
+        '@id': 'http://131.175.141.249/TripleRush/action/' + timestamp.getTime(),
         '@type': 'https://schema.org/UpdateAction',
         'object': {
           "@id": page['@id']
@@ -139,7 +139,7 @@ var enrich = function(change) {
   }
 
   var comment = {
-    '@id': 'http://example.com/comment/' + timestamp.getTime(),
+    '@id': 'http://131.175.141.249/TripleRush/comment/' + timestamp.getTime(),
     '@type': 'https://schema.org/Comment',
     'text': change.comment
 
