@@ -37,7 +37,7 @@ app.get('/TripleRush/wiki.json', function(req, res) {
   server.enricher.pipe(res);
 
   res.on('close', function() {
-    enricher.unpipe(res);
+    server.enricher.unpipe(res);
   });
 
 
