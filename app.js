@@ -13,8 +13,6 @@ var app = express();
 
 // all environments
 app.set('port', 7654);
-app.set('hostname', '131.175.141.249');
-app.set('externalUrl', '131.175.141.249');
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
@@ -41,7 +39,7 @@ if ('development' == app.get('env')) {
   app.use(errorhandler());
 }
 
-http.createServer(app).listen(app.get('port'), function() {
+app.listen(app.get('port'), '0.0.0.0', function() {
   console.log('Filter server listening on port ' + app.get('port'));
   activeStream = new WikiStream();
 });
