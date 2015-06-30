@@ -11,7 +11,7 @@ function WikiStream(options) {
   }
 
   console.log('Creating the stream');
-
+  this.close = false;
   this.w = new wikichanges.WikiChanges({
     ircNickname: "jsonLDBot",
     wikipedias: ["#en.wikipedia"]
@@ -20,11 +20,19 @@ function WikiStream(options) {
 
   this.w.listen(function(c) {
 
-    _this.push(JSON.stringify(c));
+    if (!_this.close) {
+
+      _this.push(JSON.stringify(c));
+    } else {
+      _this.push(null);
+    }
   });
+
 
   // init Transform
   Transform.call(this, options);
+
+
 }
 util.inherits(WikiStream, Transform);
 
@@ -33,4 +41,7 @@ WikiStream.prototype._read = function(enc, cb) {
   console.log('Reading stream');
 };
 
+WikiStream.prototype.closeStream = function() {
+  this.close = true;
+};
 exports = module.exports = WikiStream;

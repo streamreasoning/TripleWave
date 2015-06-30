@@ -12,7 +12,7 @@ var bodyParser = require('body-parser');
 var app = express();
 
 // all environments
-app.set('port', 7654);
+app.set('port', 80);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
@@ -32,7 +32,20 @@ app.get('/wiki.json', function(req, res) {
   activeStream = new WikiStream();
   console.log('Connection');
   var enricher = new Enricher();
+
+  enricher.on('unpipe', function() {
+    console.log('Enricher unpipe');
+    this.end();
+    //activeStream.end();
+  });
+
   activeStream.pipe(enricher).pipe(res);
+
+  res.on('close', function() {
+    activeStream.closeStream();
+    activeStream.unpipe();
+    activeStream = null;
+  });
 });
 
 app.get('/', function(req, res) {
