@@ -106,7 +106,7 @@ var enrich = function(change) {
 
     if (change.namespace.indexOf('talk') === -1) {
       page["http://xmlns.com/foaf/0.1/primaryTopic"] = {
-        "@id": "http://dbpedia.org/resource/" + change.pageUrl.split('/')[change.pageUrl.split('/').length - 1]
+        "@id": "http://live.dbpedia.org/resource/" + change.pageUrl.split('/')[change.pageUrl.split('/').length - 1]
       };
     }
 
