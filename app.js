@@ -14,7 +14,7 @@ var bodyParser = require('body-parser');
 var app = express();
 
 // all environments
-app.set('port', 7654);
+app.set('port', 80);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
@@ -53,7 +53,9 @@ app.get('/:ts', function(req, res) {
   var element = server.cache.find(req.params.ts);
 
   if (element) {
-    res.json(element);
+    res.json({
+      "@graph": element["@graph"]
+    });
   } else {
     res.status = 404;
     res.json({
