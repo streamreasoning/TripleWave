@@ -57,7 +57,7 @@ Cache.prototype.getAll = function() {
   var cache = {
     "@context": {
       "sld": "http://streamreasoning.org/ontology/SLD#",
-      "tr": "http://131.175.141.249/",
+      "tr": "http://131.175.141.249/TripleRush/",
       "generatedAt": {
         "@id": "http://www.w3.org/ns/prov#generatedAtTime",
         "@type": "http://www.w3.org/2001/XMLSchema#dateTime"
@@ -72,12 +72,12 @@ Cache.prototype.getAll = function() {
   for (var i = array.length - 1; i >= 0; i--) {
     var e = array[i];
     cache['sld:contains']["@list"].push({
-      generatedAt: e['http://example.com/#generatedAt'],
+      generatedAt: e['http://www.w3.org/ns/prov#generatedAtTime'],
       "@id": "tr:" + e.ts
     });
   }
 
-  cache["sld:lastUpdated"] = array[0]['http://example.com/#generatedAt'];
+  cache["sld:lastUpdated"] = array[0]['http://www.w3.org/ns/prov#generatedAtTime'];
 
   return cache;
 };

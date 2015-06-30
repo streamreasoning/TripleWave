@@ -22,12 +22,12 @@ var enrich = function(change) {
 
   var result = {};
   var timestamp = new Date();
-  var id = 'http://example.com/diff/' + timestamp.getTime();
+  var id = 'http://131.175.141.249/TripleRush/' + timestamp.getTime();
   var createdAt = timestamp;
 
   result.original = change;
 
-  result['http://example.com/#generatedAt'] = createdAt;
+  result['http://www.w3.org/ns/prov#generatedAtTime'] = createdAt;
   result['@id'] = id;
 
   var graph = [];
