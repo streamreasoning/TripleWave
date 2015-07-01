@@ -25,7 +25,7 @@ var enrich = function(change) {
   var id = 'http://131.175.141.249/TripleRush/' + timestamp.getTime();
   var createdAt = timestamp;
 
-  result.original = change;
+  //result.original = change;
 
   result['http://www.w3.org/ns/prov#generatedAtTime'] = createdAt;
   result['@id'] = id;
