@@ -21,8 +21,8 @@ util.inherits(Cache, Transform);
 Cache.prototype._write = function(chunk, enc, callback) {
   var data = JSON.parse(chunk);
   this.add(_.extend({
-    ts: new Date(data['http://example.com/#generatedAt']).getTime()
-  }, _.pick(data, ['http://example.com/#generatedAt', '@id', '@graph'])));
+    ts: new Date(data['http://www.w3.org/ns/prov#generatedAtTime']).getTime()
+  }, _.pick(data, ['http://www.w3.org/ns/prov#generatedAtTime', '@id', '@graph'])));
 
   callback();
 };
