@@ -57,7 +57,7 @@ Cache.prototype.getAll = function() {
   var cache = {
     "@context": {
       "sld": "http://streamreasoning.org/ontology/SLD#",
-      "tr": "http://131.175.141.249/TripleRush/",
+      "tr": "http://131.175.141.249/TripleWave/",
       "generatedAt": {
         "@id": "http://www.w3.org/ns/prov#generatedAtTime",
         "@type": "http://www.w3.org/2001/XMLSchema#dateTime"

@@ -22,7 +22,7 @@ var enrich = function(change) {
 
   var result = {};
   var timestamp = new Date();
-  var id = 'http://131.175.141.249/TripleRush/' + timestamp.getTime();
+  var id = 'http://131.175.141.249/TripleWave/' + timestamp.getTime();
   var createdAt = timestamp;
 
   //result.original = change;
@@ -114,7 +114,7 @@ var enrich = function(change) {
 
     if (change.newPage) {
       action = {
-        '@id': 'http://131.175.141.249/TripleRush/action/' + timestamp.getTime(),
+        '@id': 'http://131.175.141.249/TripleWave/action/' + timestamp.getTime(),
         '@type': 'https://schema.org/CreateAction',
         'result': {
           "@id": page['@id']
@@ -125,7 +125,7 @@ var enrich = function(change) {
       };
     } else {
       action = {
-        '@id': 'http://131.175.141.249/TripleRush/action/' + timestamp.getTime(),
+        '@id': 'http://131.175.141.249/TripleWave/action/' + timestamp.getTime(),
         '@type': 'https://schema.org/UpdateAction',
         'object': {
           "@id": page['@id']
@@ -139,7 +139,7 @@ var enrich = function(change) {
   }
 
   var comment = {
-    '@id': 'http://131.175.141.249/TripleRush/comment/' + timestamp.getTime(),
+    '@id': 'http://131.175.141.249/TripleWave/comment/' + timestamp.getTime(),
     '@type': 'https://schema.org/Comment',
     'text': change.comment
 
