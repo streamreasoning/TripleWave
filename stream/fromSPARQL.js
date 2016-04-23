@@ -3,8 +3,11 @@ var SPARQL = SparqlClient.SPARQL;
 var util = require('util');
 var stream = require('stream');
 var async = require('async');
+var PropertiesReader = require('properties-reader');
+var path = require('path');
 
-var config = require('../config/config.json');
+var configuration = PropertiesReader(path.resolve(__dirname, '../', 'config', 'config.properties'));
+
 
 var city = 'Vienna';
 
@@ -17,7 +20,7 @@ function SPARQLStream(options) {
   this.limit = 10;
   this.skip = 0;
 
-  this.endpoint = config.sparql.endpoint;
+  this.endpoint = configuration.get('rdf.endpoint');
 
   this.query = "SELECT * FROM <http://dbpedia.org> WHERE { " +
     "?city <http://dbpedia.org/property/leaderName> ?leaderName " +
