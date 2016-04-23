@@ -5,6 +5,7 @@
 var WikiStream = require("./wikiStream.js");
 var Enricher = require("./enricher.js");
 var Cache = require("./cache.js");
+var FromSPARQL = require('./stream/fromSPARQL.js');
 
 var express = require('express');
 var http = require('http');
@@ -13,8 +14,10 @@ var errorhandler = require('errorhandler');
 var bodyParser = require('body-parser');
 var app = express();
 
+var configuration = require('./config/config.json');
+
 // all environments
-app.set('port', 80);
+app.set('port', configuration.port);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
@@ -30,7 +33,7 @@ var server = {
 
 };
 
-app.get('/TripleRush/wiki.json', function(req, res) {
+app.get('/TripleWave/wiki.json', function(req, res) {
 
   console.log('Connection');
 
@@ -43,11 +46,22 @@ app.get('/TripleRush/wiki.json', function(req, res) {
 
 });
 
-app.get('/TripleRush/sGraph', function(req, res) {
+app.get('/TripleWave/sGraph', function(req, res) {
   return res.json(server.cache.getAll());
 });
 
-app.get('/TripleRush/:ts', function(req, res) {
+app.get('/TripleWave/replay', function(req, res) {
+
+  var fromSPARQL = new FromSPARQL();
+  fromSPARQL.pipe(res);
+
+  res.on('close', function() {
+    fromSPARQL.unpipe(res);
+  });
+
+});
+
+app.get('/TripleWave/:ts', function(req, res) {
   console.log('Searching element with ts ' + req.params.ts);
 
   var element = server.cache.find(req.params.ts);

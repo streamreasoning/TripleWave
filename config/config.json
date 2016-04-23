@@ -1,0 +1,9 @@
+{
+  "mode": "replay",
+  "sparql": {
+    "endpoint": "http://dbpedia.org/sparql"
+  },
+  "transformation": "",
+  "input-stream": "",
+  "port": 8100
+}

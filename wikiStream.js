@@ -19,7 +19,6 @@ function WikiStream(options) {
   _this = this;
 
   this.w.listen(function(c) {
-
     if (!_this.close) {
       _this.push(JSON.stringify(c));
     } else {
@@ -35,9 +34,7 @@ function WikiStream(options) {
 }
 util.inherits(WikiStream, Transform);
 
-WikiStream.prototype._read = function(enc, cb) {
-
-};
+WikiStream.prototype._read = function(enc, cb) {};
 
 WikiStream.prototype.closeStream = function() {
   this.close = true;

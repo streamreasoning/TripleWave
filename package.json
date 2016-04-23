@@ -1,13 +1,19 @@
 {
-  "name": "ExpoWatch",
-  "version": "0.0.0",
+  "name": "TripleWave",
+  "version": "1.0.0",
   "description": "",
-  "main": "crawler.js",
+  "main": "app.js",
   "dependencies": {
     "body-parser": "^1.13.1",
     "errorhandler": "^1.4.0",
     "express": "^4.13.0",
-    "underscore": "^1.7.0",
+    "jsonld": "^0.4.8",
+    "n3": "^0.4.5",
+    "sparql-client-2": "github:eddieantonio/node-sparql-client",
+    "turtle-to-jsonld": "github:janez87/turtle-to-jsonld",
+    "underscore": "^1.8.3",
+    "underscore.string": "^3.3.4",
+    "when": "^3.7.7",
     "wikichanges": "~0.2.7"
   },
   "devDependencies": {},
