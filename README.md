@@ -1,3 +1,3 @@
-# TripleRush
+# TripleWave
 
 w
