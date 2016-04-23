@@ -6,7 +6,9 @@ var WikiStream = require("./wikiStream.js");
 var Enricher = require("./enricher.js");
 var Cache = require("./cache.js");
 var FromSPARQL = require('./stream/fromSPARQL.js');
+var Transformer = require('./stream/transformer.js');
 
+var fs = require('fs');
 var express = require('express');
 var http = require('http');
 var path = require('path');
@@ -58,6 +60,31 @@ app.get('/TripleWave/replay', function(req, res) {
   res.on('close', function() {
     fromSPARQL.unpipe(res);
   });
+
+});
+
+app.get('/TripleWave/test', function(req, res) {
+
+  var transformer = new Transformer();
+
+  var lines = fs.readFileSync('./r2rml-js/lsd_small.csv').toString().split('\n');
+
+  var data = [];
+  var labels = lines[0].split(',');
+
+  for (l = 1; l < lines.length; l++) {
+    var line = lines[l].split(',');
+    console.log(line);
+    var mmap = {};
+    for (i = 0; i < labels.length; i++) {
+      console.log(line[i]);
+      mmap[labels[i]] = line[i];
+    }
+
+    data.push(mmap);
+  }
+
+  return res.json(data);
 
 });
 

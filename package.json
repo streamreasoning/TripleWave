@@ -9,6 +9,7 @@
     "express": "^4.13.0",
     "jsonld": "^0.4.8",
     "n3": "^0.4.5",
+    "rdflib": "^0.6.1",
     "sparql-client-2": "github:eddieantonio/node-sparql-client",
     "turtle-to-jsonld": "github:janez87/turtle-to-jsonld",
     "underscore": "^1.8.3",

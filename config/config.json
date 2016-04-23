@@ -3,7 +3,6 @@
   "sparql": {
     "endpoint": "http://dbpedia.org/sparql"
   },
-  "transformation": "",
-  "input-stream": "",
+  "transformation": "lsd.r2rml",
   "port": 8100
 }
