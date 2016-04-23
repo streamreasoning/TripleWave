@@ -8,6 +8,7 @@ var Cache = require("./cache.js");
 var FromSPARQL = require('./stream/fromSPARQL.js');
 var Transformer = require('./stream/transformer.js');
 
+var PropertiesReader = require('properties-reader');
 var fs = require('fs');
 var express = require('express');
 var http = require('http');
@@ -16,10 +17,11 @@ var errorhandler = require('errorhandler');
 var bodyParser = require('body-parser');
 var app = express();
 
-var configuration = require('./config/config.json');
+//var configuration = require('./config/config.json');
+var configuration = PropertiesReader(path.resolve(__dirname, 'config', 'config.properties'));
 
 // all environments
-app.set('port', configuration.port);
+app.set('port', configuration.get('port'));
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
