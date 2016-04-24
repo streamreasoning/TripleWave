@@ -22,9 +22,7 @@ function SPARQLStream(options) {
 
   this.endpoint = configuration.get('rdf_endpoint');
 
-  this.query = "SELECT * FROM <http://dbpedia.org> WHERE { " +
-    "?city <http://dbpedia.org/property/leaderName> ?leaderName " +
-    "} LIMIT 10";
+  this.query = "SELECT * FROM input WHERE{ GRAPH [g] {?s ?p ?o}}";
 
   this.client = new SparqlClient(this.endpoint);
 
@@ -53,9 +51,6 @@ function SPARQLStream(options) {
 
   this.queryEndpoint = function() {
     this.client.query(this.query)
-      .bind('city', {
-        db: 'Vienna'
-      })
       .execute(function(error, data) {
         if (error) console.log(error);
 

@@ -2,7 +2,6 @@
  * Module dependencies.
  */
 
-var WikiStream = require("./stream/input_stream/wikiStream.js");
 var Enricher = require("./stream/enricher.js");
 var Cache = require("./stream/cache.js");
 var FromSPARQL = require('./stream/input_stream/fromSPARQL.js');
@@ -37,34 +36,6 @@ var server = {
 
 };
 
-app.get('/TripleWave/wiki.json', function(req, res) {
-
-  console.log('Connection');
-
-  server.enricher.pipe(res);
-
-  res.on('close', function() {
-    server.enricher.unpipe(res);
-  });
-
-
-});
-
-app.get('/TripleWave/sGraph', function(req, res) {
-  return res.json(server.cache.getAll());
-});
-
-app.get('/TripleWave/replay', function(req, res) {
-
-  var fromSPARQL = new FromSPARQL();
-  fromSPARQL.pipe(res);
-
-  res.on('close', function() {
-    fromSPARQL.unpipe(res);
-  });
-
-});
-
 app.get('/TripleWave/test', function(req, res) {
 
   var transformer = new Transformer();
@@ -90,35 +61,77 @@ app.get('/TripleWave/test', function(req, res) {
 
 });
 
-app.get('/TripleWave/:ts', function(req, res) {
-  console.log('Searching element with ts ' + req.params.ts);
+if (configuration.get('mode') === 'replay' || configuration.get('mode') === 'endless') {
 
-  var element = server.cache.find(req.params.ts);
+  app.get('/TripleWave/replay', function(req, res) {
 
-  if (element) {
-    res.json({
-      "@graph": element["@graph"]
+    var fromSPARQL = new FromSPARQL();
+    fromSPARQL.pipe(res);
+
+    res.on('close', function() {
+      fromSPARQL.unpipe(res);
     });
-  } else {
-    res.status = 404;
-    res.json({
-      error: "Element not found"
-    });
-  }
-});
 
-
-if ('development' == app.get('env')) {
-  app.use(errorhandler());
+  });
 }
 
+if (configuration.get('mode') === 'transform') {
+
+  app.get('/TripleWave/stream.json', function(req, res) {
+
+    console.log('Connection');
+
+    server.enricher.pipe(res);
+
+    res.on('close', function() {
+      server.enricher.unpipe(res);
+    });
+
+
+  });
+
+  app.get('/TripleWave/sGraph', function(req, res) {
+    return res.json(server.cache.getAll());
+  });
+
+
+
+  app.get('/TripleWave/:ts', function(req, res) {
+    console.log('Searching element with ts ' + req.params.ts);
+
+    var element = server.cache.find(req.params.ts);
+
+    if (element) {
+      res.json({
+        "@graph": element["@graph"]
+      });
+    } else {
+      res.status = 404;
+      res.json({
+        error: "Element not found"
+      });
+    }
+  });
+
+
+  if ('development' == app.get('env')) {
+    app.use(errorhandler());
+  }
+
+}
 app.listen(app.get('port'), function() {
 
-  server.cache = new Cache({});
-  server.enricher = new Enricher(server);
-  server.activeStream = new WikiStream();
-  server.activeStream.pipe(server.enricher);
-  server.enricher.pipe(server.cache);
+  if (configuration.get('mode') === 'transform') {
+    console.log('Transform mode');
+    console.log('Setting up the required streams');
+    var Webstream = require(path.resolve('stream', 'input_stream', configuration.get('stream_name')));
 
-  console.log('Filter server listening on port ' + app.get('port'));
+    server.cache = new Cache({});
+    server.enricher = new Enricher(server);
+    server.activeStream = new Webstream();
+    server.activeStream.pipe(server.enricher);
+    server.enricher.pipe(server.cache);
+  }
+
+  console.log('TripleWave listening on port ' + app.get('port'));
 });
