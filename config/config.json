@@ -1,8 +1,0 @@
-{
-  "mode": "replay",
-  "sparql": {
-    "endpoint": "http://dbpedia.org/sparql"
-  },
-  "transformation": "lsd.r2rml",
-  "port": 8100
-}

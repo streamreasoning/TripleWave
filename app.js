@@ -2,10 +2,10 @@
  * Module dependencies.
  */
 
-var WikiStream = require("./wikiStream.js");
-var Enricher = require("./enricher.js");
-var Cache = require("./cache.js");
-var FromSPARQL = require('./stream/fromSPARQL.js');
+var WikiStream = require("./stream/input_stream/wikiStream.js");
+var Enricher = require("./stream/enricher.js");
+var Cache = require("./stream/cache.js");
+var FromSPARQL = require('./stream/input_stream/fromSPARQL.js');
 var Transformer = require('./stream/transformer.js');
 
 var PropertiesReader = require('properties-reader');

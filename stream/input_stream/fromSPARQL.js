@@ -6,7 +6,7 @@ var async = require('async');
 var PropertiesReader = require('properties-reader');
 var path = require('path');
 
-var configuration = PropertiesReader(path.resolve(__dirname, '../', 'config', 'config.properties'));
+var configuration = PropertiesReader(path.resolve(__dirname, '../../', 'config', 'config.properties'));
 
 
 var city = 'Vienna';
@@ -20,16 +20,13 @@ function SPARQLStream(options) {
   this.limit = 10;
   this.skip = 0;
 
-  this.endpoint = configuration.get('rdf.endpoint');
+  this.endpoint = configuration.get('rdf_endpoint');
 
   this.query = "SELECT * FROM <http://dbpedia.org> WHERE { " +
     "?city <http://dbpedia.org/property/leaderName> ?leaderName " +
     "} LIMIT 10";
 
-  this.client = new SparqlClient(this.endpoint)
-    .register({
-      db: 'http://dbpedia.org/resource/'
-    });
+  this.client = new SparqlClient(this.endpoint);
 
   var cache = [];
 
