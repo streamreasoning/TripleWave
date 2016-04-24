@@ -6,7 +6,7 @@
 if [ "$mode" = "replay" ]; then
    cd fuseki
 #   if [ "$file" = "" ]; then
-      java -jar jena-fuseki-server-2.3.1.jar --file=../$rdf_file --update /ds &
+      java -jar jena-fuseki-server-2.3.1.jar --update --mem /ds &
 #   else
 #      java -jar jena-fuseki-server-2.3.1.jar --mem --update /ds &
    cd ..
