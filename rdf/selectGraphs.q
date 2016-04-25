@@ -1,0 +1,1 @@
+SELECT DISTINCT ?graph ?key FROM <http://example.org/sgraph> where {?graph <http://example.org/hasKey> ?key}

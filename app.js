@@ -68,6 +68,22 @@ app.get('/TripleWave/test', function(req, res) {
 
 if (configuration.get('mode') === 'replay' || configuration.get('mode') === 'endless') {
 
+  var WebSocketServer = require('ws').Server;
+  var wss = new WebSocketServer({
+    port: 8101,
+    path: '/TripleWave/replay'
+  });
+
+  wss.on('connection', function(ws) {
+    var fromSPARQL = new FromSPARQL();
+
+    console.log('Webscoket openeded');
+    fromSPARQL.on('data', function(data) {
+      console.log(data.toString());
+      ws.send(data.toString());
+    });
+  });
+
   app.get('/TripleWave/replay', function(req, res) {
 
     var fromSPARQL = new FromSPARQL();
@@ -131,10 +147,17 @@ var loadFile = function(callback) {
   console.log('Loading the dataset file ' + configuration.get('rdf_file'));
 
   //'LOAD <file:../rdf/data.ttl> INTO GRAPH <http://example/input>'
-  var query = 'LOAD <file:..' + configuration.get('rdf_file') + '> INTO GRAPH <http://example/input>';
+  //var query = 'LOAD <file:..' + configuration.get('rdf_file') + '> INTO GRAPH <http://example/input>';
+
+  var query = fs.readFileSync(path.resolve(__dirname, 'rdf', 'loadFile.q')).toString();
+
+  query = query.split('[file]').join(configuration.get('rdf_file'));
+
+  console.log('loading file')
+  console.log(query)
 
   var options = {
-    url: 'http://localhost:3030/ds/update',
+    url: configuration.get('rdf_update_endpoint'),
     method: 'POST',
     form: {
       update: query
@@ -156,10 +179,11 @@ var transformInput = function(callback) {
     return callback();
   }
 
-  var create = 'CREATE GRAPH <http://example.org/sgraph>';
+  var create = fs.readFileSync(path.resolve(__dirname, 'rdf', 'createGraph.q')).toString();
 
+  console.log(create);
   var options = {
-    url: 'http://localhost:3030/ds/update',
+    url: configuration.get('rdf_update_endpoint'),
     method: 'POST',
     form: {
       update: create
@@ -174,6 +198,7 @@ var transformInput = function(callback) {
 
     var query = fs.readFileSync('./rdf/insertQuery.q').toString();
 
+    console.log(query);
     options.form.update = query;
 
     return request.post(options, callback);
@@ -188,12 +213,14 @@ var createNewGraphs = function(callback) {
     return callback();
   }
 
-  var query = 'SELECT DISTINCT ?graph ?key FROM <http://example.org/sgraph> where {?graph <http://example.org/hasKey> ?key}';
+  var query = fs.readFileSync(path.resolve(__dirname, 'rdf', 'selectGraphs.q')).toString();
 
-  var client = new SparqlClient('http://localhost:3030/ds/query');
+  console.log('creating the new graph');
+  console.log(query);
+  var client = new SparqlClient(configuration.get('rdf_query_endpoint'));
 
   var createNewTriples = function(triple, cb) {
-
+    console.log(triple);
     var insertQuery = fs.readFileSync('./rdf/insertNewTriple.q').toString();
 
     var graph = triple.graph.value;
@@ -203,9 +230,10 @@ var createNewGraphs = function(callback) {
     insertQuery = insertQuery.split('[k]').join(key);
 
     var create = 'CREATE GRAPH <' + graph + '>';
-
+    console.log(create)
+    console.log(insertQuery)
     var options = {
-      url: 'http://localhost:3030/ds/update',
+      url: configuration.get('rdf_update_endpoint'),
       method: 'POST',
       form: {
         update: create
@@ -261,7 +289,7 @@ app.listen(app.get('port'), function() {
     console.log('TripleWave listening on port ' + app.get('port'));
 
   } else {
-    console.log('Loading the rdf dataset (TODO)');
+    console.log('Loading the rdf dataset');
 
     var actions = [loadFile, transformInput, createNewGraphs];
 

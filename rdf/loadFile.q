@@ -1,0 +1,1 @@
+LOAD <file:..[file]> INTO GRAPH <http://example/input> 
