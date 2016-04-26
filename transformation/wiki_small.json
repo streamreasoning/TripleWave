@@ -1,0 +1,31 @@
+[
+{ 
+  "page": "Naruto: Ultimate Ninja",
+  "time": 3242342,
+  "pageUrl": "http://en.wikipedia.org/wiki/Naruto:_Ultimate_Ninja",
+   "url": "https://en.wikipedia.org/w/index.php?diff=669355471&oldid=669215360",
+   "delta": -7, "comment": "/ Characters /",
+   "wikipediaUrl": "http://en.wikipedia.org", 
+   "channel": "#en.wikipedia", "wikipediaShort": "en",
+   "user": "Jmorrison230582", 
+   "userUrl": "http://en.wikipedia.org/wiki/User/Jmorrison230582",
+   "unpatrolled": false, 
+   "newPage": false, 
+   "robot": false,
+   "namespace": "article" 
+},
+{ 
+  "page": "Batman",
+  "time": 123345,
+  "pageUrl": "http://en.wikipedia.org/wiki/Batman",
+   "url": "https://en.wikipedia.org/w/index.php?diff=669355473&oldid=669215363",
+   "delta": -7, "comment": "/ Forever /",
+   "wikipediaUrl": "http://en.wikipedia.org", 
+   "channel": "#en.wikipedia", "wikipediaShort": "en",
+   "user": "beta2k", 
+   "userUrl": "http://en.wikipedia.org/wiki/User/beta2k",
+   "unpatrolled": false, 
+   "newPage": false, 
+   "robot": false,
+   "namespace": "article" 
+}]

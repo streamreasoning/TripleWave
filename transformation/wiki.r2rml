@@ -1,0 +1,29 @@
+@prefix rr: <http://www.w3.org/ns/r2rml#>.
+@prefix sr: <http://purl.oclc.org/rsp/srml#>.
+@prefix rml: <http://semweb.mmlab.be/ns/rml#>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix obs: <http://knoesis.wright.edu/ssw/ont/sensor-observation.owl#>.
+@prefix time: <http://www.w3.org/2006/time#>.
+@prefix schema: <https://schema.org/>.
+@prefix : <http://epfl.ch/mapping/>.
+
+
+ 
+:WikiMap  
+  rml:logicalSource [
+    rml:root true;
+    rml:source "jdbc coso"; ];  
+  rr:subjectMap [ 
+    rr:template "http://131.175.141.249/TripleWave/{time}"];
+  rr:predicateObjectMap [rr:predicate schema:object; rr:objectMap [ rr:column "pageUrl" ]];     		   		  
+  rr:predicateObjectMap [rr:predicate schema:agent;  rr:objectMap [ rr:column "userUrl"] ];
+
+  rr:predicateObjectMap [ 
+    rr:predicate rdf:type; 
+    rr:objectMap [ rr:constant schema:UpdateAction]];
+  rr:spredicateObjectMap [ 
+    rr:predicate obs:result; rr:objectMap [ rr:parentTriplesMap :MeasureDataMap]];
+  rr:psredicateObjectMap [ 
+    rr:predicate obs:samplingTime; rr:objectMap [ rr:parentTriplesMap :InstantMap]].
