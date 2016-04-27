@@ -10,7 +10,7 @@ if [ "$mode" = "replay" ]; then
 #   else
 #      java -jar jena-fuseki-server-2.3.1.jar --mem --update /ds &
    cd ..
-   sleep 5
+   sleep 7
 else
    echo "don't start fuseki"
 fi

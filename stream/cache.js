@@ -2,6 +2,7 @@ var stream = require('stream');
 var util = require('util');
 var _ = require('underscore');
 var Transform = stream.Transform || require('readable-stream').Transform;
+var configuration = PropertiesReader(path.resolve(__dirname, '../', 'config', 'config.properties'));
 
 function Cache(options) {
 
@@ -50,9 +51,9 @@ Cache.prototype.getAll = function() {
 
   var array = _.clone(this.array);
 
-  if (array.length === 0) {
+  /*if (array.length === 0) {
     return {};
-  }
+  }*/
 
   var cache = {
     "@context": {
@@ -68,6 +69,9 @@ Cache.prototype.getAll = function() {
       "@list": []
     }
   };
+
+  cache['sld:streamLocation'] = configuration.get('ws_stream_location');
+  cache['sld:tBoxLocation'] = configuration.get('tbox_stream_location');
 
   for (var i = array.length - 1; i >= 0; i--) {
     var e = array[i];

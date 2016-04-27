@@ -71,12 +71,13 @@ if (configuration.get('mode') === 'replay' || configuration.get('mode') === 'end
   var WebSocketServer = require('ws').Server;
   var wss = new WebSocketServer({
     port: 8101,
-    path: '/TripleWave/replay'
+    path: configuration.get('ws_stream_location')
   });
 
   wss.on('connection', function(ws) {
     var fromSPARQL = new FromSPARQL();
 
+    fromSPARQL.pipe(server.cache);
     console.log('Webscoket openeded');
     fromSPARQL.on('data', function(data) {
       console.log(data.toString());
@@ -84,11 +85,11 @@ if (configuration.get('mode') === 'replay' || configuration.get('mode') === 'end
     });
   });
 
-  app.get('/TripleWave/replay', function(req, res) {
+  app.get('/TripleWave/stream', function(req, res) {
 
     var fromSPARQL = new FromSPARQL();
     fromSPARQL.pipe(res);
-
+    fromSPARQL.pipe(server.cache);
     res.on('close', function() {
       fromSPARQL.unpipe(res);
     });
@@ -96,9 +97,43 @@ if (configuration.get('mode') === 'replay' || configuration.get('mode') === 'end
   });
 }
 
+app.get('/TripleWave/sGraph', function(req, res) {
+  return res.json(server.cache.getAll());
+});
+
+app.get('/TripleWave/:ts', function(req, res) {
+  console.log('Searching element with ts ' + req.params.ts);
+
+  var element = server.cache.find(req.params.ts);
+
+  if (element) {
+    res.json({
+      "@graph": element["@graph"]
+    });
+  } else {
+    res.status = 404;
+    res.json({
+      error: "Element not found"
+    });
+  }
+});
+
 if (configuration.get('mode') === 'transform') {
 
-  app.get('/TripleWave/stream.json', function(req, res) {
+  var WebSocketServer = require('ws').Server;
+  var wss = new WebSocketServer({
+    port: 8101,
+    path: configuration.get('ws_stream_location')
+  });
+
+  wss.on('connection', function(ws) {
+    console.log('Webscoket openeded');
+    server.enricher.on('data', function(data) {
+      ws.send(data.toString());
+    });
+  });
+
+  app.get('/TripleWave/stream', function(req, res) {
 
     console.log('Connection');
 
@@ -111,28 +146,6 @@ if (configuration.get('mode') === 'transform') {
 
   });
 
-  app.get('/TripleWave/sGraph', function(req, res) {
-    return res.json(server.cache.getAll());
-  });
-
-
-
-  app.get('/TripleWave/:ts', function(req, res) {
-    console.log('Searching element with ts ' + req.params.ts);
-
-    var element = server.cache.find(req.params.ts);
-
-    if (element) {
-      res.json({
-        "@graph": element["@graph"]
-      });
-    } else {
-      res.status = 404;
-      res.json({
-        error: "Element not found"
-      });
-    }
-  });
 
 
   if ('development' == app.get('env')) {
@@ -230,8 +243,8 @@ var createNewGraphs = function(callback) {
     insertQuery = insertQuery.split('[k]').join(key);
 
     var create = 'CREATE GRAPH <' + graph + '>';
-    console.log(create)
-    console.log(insertQuery)
+    console.log(create);
+    console.log(insertQuery);
     var options = {
       url: configuration.get('rdf_update_endpoint'),
       method: 'POST',
@@ -291,6 +304,7 @@ app.listen(app.get('port'), function() {
   } else {
     console.log('Loading the rdf dataset');
 
+    server.cache = new Cache({});
     var actions = [loadFile, transformInput, createNewGraphs];
 
     async.series(actions, function(err) {
