@@ -16,7 +16,7 @@
     rml:root true;
     rml:source "jdbc coso"; ];  
   rr:subjectMap [ 
-    rr:template "http://131.175.141.249/TripleWave/{time}"];
+    rr:template "http://localhost:8100/TripleWave/{time}"];
   rr:predicateObjectMap [rr:predicate schema:object; rr:objectMap [ rr:column "pageUrl" ]];     		   		  
   rr:predicateObjectMap [rr:predicate schema:agent;  rr:objectMap [ rr:column "userUrl"] ];
 

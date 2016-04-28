@@ -70,7 +70,7 @@ function R2rml(file) {
     if (map.template != null) {
       return transformTemp(map.template.value, data)
     } else if (map.column != null) {
-      return data.get(column.value)
+      return data.get(map.column.value)
     } else {
       return map.constant
     }

@@ -1,10 +1,33 @@
 var stream = require('stream');
 var util = require('util');
 var _ = require('underscore');
-
+var R2rml = require('../r2rml-js/r2rml.js');
+var PropertiesReader = require('properties-reader');
+var path = require('path');
 var Transform = stream.Transform || require('readable-stream').Transform;
+var N3 = require('n3');
+var jsonld = require('jsonld');
+var configuration = PropertiesReader(path.resolve(__dirname, '../', 'config', 'config.properties'));
 
 function EnrichStream(options) {
+
+  this.mapping = new R2rml(path.resolve(__dirname, '../', 'transformation', configuration.get('stream_mapping')));
+
+  this.enrich = function(data) {
+
+    var keys = Object.keys(data);
+
+    var mmap = new Map();
+    for (var k = 0; k < keys.length; k++) {
+      var key = keys[k];
+      mmap.set(key, data[key]);
+
+    }
+
+
+    return this.mapping.transform(mmap);
+  };
+
   // allow use without new
   if (!(this instanceof EnrichStream)) {
     return new EnrichStream(options);
@@ -16,9 +39,9 @@ function EnrichStream(options) {
 util.inherits(EnrichStream, Transform);
 
 
-var context = "https://schema.org/";
+//var context = "https://schema.org/";
 
-var enrich = function(change) {
+/*var enrich = function(change) {
 
   var result = {};
   var timestamp = new Date();
@@ -155,14 +178,33 @@ var enrich = function(change) {
 
 
   return result;
-};
+};*/
+
+
 
 EnrichStream.prototype._transform = function(chunk, enc, cb) {
 
   var change = JSON.parse(chunk.toString());
-  change = enrich(change);
+  console.log(change)
+  change = this.enrich(change);
 
-  this.push(JSON.stringify(change));
+  var writer = N3.Writer({
+    format: 'N-Triples'
+  });
+
+  for (var i = change.length - 1; i >= 0; i--) {
+    writer.addTriple(change[i]);
+  }
+  var _this = this;
+  writer.end(function(error, result) {
+    console.log(result);
+    jsonld.fromRDF(result, function(err, json) {
+      console.log(err);
+      console.log(json);
+      _this.push(json);
+    });
+
+  });
   cb();
 };
 

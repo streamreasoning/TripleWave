@@ -17,11 +17,11 @@ for (l = 0; l < maps.length; l++) {
 function readJson(file) {
   var data = []
   var json = JSON.parse(fs.readFileSync(file).toString());
-  json.forEach (function (obj){
-console.log("kkkk "+obj)
+  json.forEach(function(obj) {
+    console.log("kkkk " + obj)
 
     var mmap = new Map()
-    Object.keys(obj).forEach (function(key) {
+    Object.keys(obj).forEach(function(key) {
       mmap.set(key, obj[key])
     });
     data.push(mmap)
