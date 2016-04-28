@@ -40,11 +40,24 @@ Cache.prototype.add = function(element) {
 };
 
 Cache.prototype.find = function(ts) {
-  console.log(ts);
-  ts = parseInt(ts);
+
+  var id = configuration.get('hostname');
+
+  if (configuration.get('port')) {
+    id += ':' + configuration.get('port');
+  }
+
+  id += configuration.get('path') + '/';
+
+  id += ts;
+  console.log(id);
   for (var i = this.array.length - 1; i >= 0; i--) {
     var e = this.array[i];
-    if (e.ts === ts) {
+
+    console.log(e['@id']);
+    console.log(e['@id']);
+
+    if (e['@id'] === id) {
       return e;
     }
   }
@@ -61,8 +74,7 @@ Cache.prototype.getAll = function() {
 
   var cache = {
     "@context": {
-      "sld": "http://streamreasoning.org/ontology/SLD#",
-      "tr": "http://131.175.141.249/TripleWave/",
+      "sld": "http://streamreasoning.org/ontologies/SLD4TripleWave#",
       "generatedAt": {
         "@id": "http://www.w3.org/ns/prov#generatedAtTime",
         "@type": "http://www.w3.org/2001/XMLSchema#dateTime"

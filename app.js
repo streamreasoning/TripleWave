@@ -77,11 +77,9 @@ if (configuration.get('mode') === 'replay' || configuration.get('mode') === 'end
   });
 
   wss.on('connection', function(ws) {
-    var fromSPARQL = new FromSPARQL();
 
-    fromSPARQL.pipe(server.cache);
     console.log('Webscoket openeded');
-    fromSPARQL.on('data', function(data) {
+    server.fromSPARQL.on('data', function(data) {
       console.log(data.toString());
       ws.send(data.toString());
     });
@@ -89,9 +87,7 @@ if (configuration.get('mode') === 'replay' || configuration.get('mode') === 'end
 
   app.get('/TripleWave/stream', function(req, res) {
 
-    var fromSPARQL = new FromSPARQL();
-    fromSPARQL.pipe(res);
-    fromSPARQL.pipe(server.cache);
+    server.fromSPARQL.pipe(res);
     res.on('close', function() {
       fromSPARQL.unpipe(res);
     });
@@ -157,6 +153,24 @@ app.get('/TripleWave/:ts', function(req, res) {
     });
   }
 });
+
+app.get('/TripleWave/graph/:ts', function(req, res) {
+  console.log('Searching element with ts ' + req.params.ts);
+
+  var element = server.cache.find(req.params.ts);
+
+  if (element) {
+    res.json({
+      "@graph": element["@graph"]
+    });
+  } else {
+    res.status = 404;
+    res.json({
+      error: "Element not found"
+    });
+  }
+});
+
 var loadFile = function(callback) {
 
   console.log('Loading the dataset file ' + configuration.get('rdf_file'));
@@ -307,7 +321,6 @@ app.listen(app.get('port'), function() {
   var argv = require('minimist')(process.argv.slice(2));
 
 
-
   if (configuration.get('mode') === 'transform') {
     console.log('Transform mode');
     console.log('Setting up the required streams');
@@ -322,17 +335,19 @@ app.listen(app.get('port'), function() {
 
   } else {
     console.log('Loading the rdf dataset');
-
-    server.cache = new Cache({});
     var actions = [loadFile, transformInput, createNewGraphs];
 
     async.series(actions, function(err) {
       if (err) throw err;
 
-      if (argv.fuseki) {
-        server.fuseki = fuseki;
+      if (argv.f) {
+        server.fuseki = argv.f;
         console.log('Starting TripleWave with Fuseki (pid: ' + server.fuseki + ' )');
       }
+
+      server.cache = new Cache({});
+      server.fromSPARQL = new FromSPARQL();
+      server.fromSPARQL.pipe(server.cache);
       console.log('TripleWave listening on port ' + app.get('port'));
     });
 

@@ -17,4 +17,4 @@ fi
 
 
 echo "the fuseki pid is $!"
-node app.js -fuseki=$
+node app.js -fuseki=$!
