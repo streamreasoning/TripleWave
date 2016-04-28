@@ -71,9 +71,12 @@ function R2rml(file) {
       return transformTemp(map.template.value, data)
     } else if (map.column != null) {
       return data.get(map.column.value)
-    } else {
-      return map.constant
+    } else if (map.constant.uri!=null){
+      return map.constant.uri
     }
+    else {
+      return map.constant
+   }
   }
 
   function transformPOMap(po, data) {
