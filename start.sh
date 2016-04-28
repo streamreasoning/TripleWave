@@ -10,11 +10,11 @@ if [ "$mode" = "replay" ]; then
 #   else
 #      java -jar jena-fuseki-server-2.3.1.jar --mem --update /ds &
    cd ..
-   sleep 7
+   sleep 10
 else
    echo "don't start fuseki"
 fi
 
 
 echo "the fuseki pid is $!"
-node app.js
+node app.js -fuseki=$

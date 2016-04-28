@@ -2,6 +2,10 @@ var stream = require('stream');
 var util = require('util');
 var _ = require('underscore');
 var Transform = stream.Transform || require('readable-stream').Transform;
+var PropertiesReader = require('properties-reader');
+var path = require('path');
+
+
 var configuration = PropertiesReader(path.resolve(__dirname, '../', 'config', 'config.properties'));
 
 function Cache(options) {
@@ -36,10 +40,10 @@ Cache.prototype.add = function(element) {
 };
 
 Cache.prototype.find = function(ts) {
+  console.log(ts);
   ts = parseInt(ts);
   for (var i = this.array.length - 1; i >= 0; i--) {
     var e = this.array[i];
-    console.log(e);
     if (e.ts === ts) {
       return e;
     }
@@ -70,18 +74,21 @@ Cache.prototype.getAll = function() {
     }
   };
 
-  cache['sld:streamLocation'] = configuration.get('ws_stream_location');
+  cache['sld:streamLocation'] = 'ws://' + configuration.get('hostname') + ':' + configuration.get('ws_port') + configuration.get('ws_stream_location');
   cache['sld:tBoxLocation'] = configuration.get('tbox_stream_location');
 
   for (var i = array.length - 1; i >= 0; i--) {
     var e = array[i];
     cache['sld:contains']["@list"].push({
       generatedAt: e['http://www.w3.org/ns/prov#generatedAtTime'],
-      "@id": "tr:" + e.ts
+      "@id": e["@id"]
     });
   }
 
-  cache["sld:lastUpdated"] = array[0]['http://www.w3.org/ns/prov#generatedAtTime'];
+  if (array.length > 0) {
+
+    cache["sld:lastUpdated"] = array[0]['http://www.w3.org/ns/prov#generatedAtTime'];
+  }
 
   return cache;
 };

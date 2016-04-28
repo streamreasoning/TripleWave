@@ -17,6 +17,8 @@ var errorhandler = require('errorhandler');
 var bodyParser = require('body-parser');
 var async = require('async');
 var SparqlClient = require('sparql-client-2');
+var ps = require('ps-node');
+
 var SPARQL = SparqlClient.SPARQL;
 
 var app = express();
@@ -70,7 +72,7 @@ if (configuration.get('mode') === 'replay' || configuration.get('mode') === 'end
 
   var WebSocketServer = require('ws').Server;
   var wss = new WebSocketServer({
-    port: 8101,
+    port: configuration.get('ws_port'),
     path: configuration.get('ws_stream_location')
   });
 
@@ -97,26 +99,7 @@ if (configuration.get('mode') === 'replay' || configuration.get('mode') === 'end
   });
 }
 
-app.get('/TripleWave/sGraph', function(req, res) {
-  return res.json(server.cache.getAll());
-});
 
-app.get('/TripleWave/:ts', function(req, res) {
-  console.log('Searching element with ts ' + req.params.ts);
-
-  var element = server.cache.find(req.params.ts);
-
-  if (element) {
-    res.json({
-      "@graph": element["@graph"]
-    });
-  } else {
-    res.status = 404;
-    res.json({
-      error: "Element not found"
-    });
-  }
-});
 
 if (configuration.get('mode') === 'transform') {
 
@@ -154,7 +137,26 @@ if (configuration.get('mode') === 'transform') {
 
 }
 
+app.get('/TripleWave/sGraph', function(req, res) {
+  return res.json(server.cache.getAll());
+});
 
+app.get('/TripleWave/:ts', function(req, res) {
+  console.log('Searching element with ts ' + req.params.ts);
+
+  var element = server.cache.find(req.params.ts);
+
+  if (element) {
+    res.json({
+      "@graph": element["@graph"]
+    });
+  } else {
+    res.status = 404;
+    res.json({
+      error: "Element not found"
+    });
+  }
+});
 var loadFile = function(callback) {
 
   console.log('Loading the dataset file ' + configuration.get('rdf_file'));
@@ -166,8 +168,7 @@ var loadFile = function(callback) {
 
   query = query.split('[file]').join(configuration.get('rdf_file'));
 
-  console.log('loading file')
-  console.log(query)
+  console.log(query);
 
   var options = {
     url: configuration.get('rdf_update_endpoint'),
@@ -192,7 +193,14 @@ var transformInput = function(callback) {
     return callback();
   }
 
+  var hostname = configuration.get('hostname');
+  var port = configuration.get('port');
+  var location = configuration.get('path');
+
+  var graphName = hostname + ':' + port + location;
+
   var create = fs.readFileSync(path.resolve(__dirname, 'rdf', 'createGraph.q')).toString();
+  create = create.split('[hostname]').join(graphName);
 
   console.log(create);
   var options = {
@@ -210,6 +218,7 @@ var transformInput = function(callback) {
     if (error) return callback(error);
 
     var query = fs.readFileSync('./rdf/insertQuery.q').toString();
+    query = query.split('[graphname]').join(graphName);
 
     console.log(query);
     options.form.update = query;
@@ -225,8 +234,14 @@ var createNewGraphs = function(callback) {
     console.log('No need to transform the file');
     return callback();
   }
+  var hostname = configuration.get('hostname');
+  var port = configuration.get('port');
+  var location = configuration.get('path');
+
+  var graphName = hostname + ':' + port + location;
 
   var query = fs.readFileSync(path.resolve(__dirname, 'rdf', 'selectGraphs.q')).toString();
+  query = query.split('[hostname]').join(graphName);
 
   console.log('creating the new graph');
   console.log(query);
@@ -289,6 +304,10 @@ var createNewGraphs = function(callback) {
 
 app.listen(app.get('port'), function() {
 
+  var argv = require('minimist')(process.argv.slice(2));
+
+
+
   if (configuration.get('mode') === 'transform') {
     console.log('Transform mode');
     console.log('Setting up the required streams');
@@ -310,9 +329,34 @@ app.listen(app.get('port'), function() {
     async.series(actions, function(err) {
       if (err) throw err;
 
+      if (argv.fuseki) {
+        server.fuseki = fuseki;
+        console.log('Starting TripleWave with Fuseki (pid: ' + server.fuseki + ' )');
+      }
       console.log('TripleWave listening on port ' + app.get('port'));
     });
 
   }
 
+});
+
+
+process.on('beforeExit', function() {
+  if (server.fuseki) {
+    ps.kill(server.fuseki, function(err) {
+      if (err) console.log(err);
+
+      console.log('Fuseki killed :(');
+    });
+  }
+});
+
+process.on('exit', function() {
+  if (server.fuseki) {
+    ps.kill(server.fuseki, function(err) {
+      if (err) console.log(err);
+
+      console.log('Fuseki killed :(');
+    });
+  }
 });

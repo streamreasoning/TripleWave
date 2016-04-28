@@ -15,9 +15,6 @@ var Transform = stream.Transform || require('readable-stream').Transform;
 function SPARQLStream(options) {
 
 
-  this.limit = 10;
-  this.skip = 0;
-
   this.endpoint = configuration.get('rdf_query_endpoint');
 
   this.query = fs.readFileSync(path.resolve(__dirname, '../../', 'rdf', 'selectGraphsWithTS.q')).toString();
@@ -25,6 +22,7 @@ function SPARQLStream(options) {
   this.client = new SparqlClient(this.endpoint);
 
   var cache = [];
+  var hostname = configuration.get('hostname');
 
   var _this = this;
 
@@ -49,7 +47,13 @@ function SPARQLStream(options) {
 
     request.post(options, function(error, response, body) {
 
-      _this.push(body);
+      var element = {
+        "http://www.w3.org/ns/prov#generatedAtTime": data.ts,
+        "@id": data.graph,
+        "@graph": JSON.parse(body)
+      };
+
+      _this.push(JSON.stringify(element));
       console.log('Next event in ' + data.delta || 0 + 'ms');
       return setTimeout(callback, data.delta || 0);
     });
