@@ -35,13 +35,12 @@ Cache.prototype._write = function(chunk, enc, callback) {
 Cache.prototype.add = function(element) {
   if (this.array.length === this.limit) {
     this.array.pop();
-  }
-  this.array.unshift(element);
+}  this.array.unshift(element);
 };
 
 Cache.prototype.find = function(ts) {
 
-  var id = configuration.get('hostname');
+  var id = 'http://' + configuration.get('hostname');
 
   if (configuration.get('port')) {
     id += ':' + configuration.get('port');
@@ -55,7 +54,7 @@ Cache.prototype.find = function(ts) {
     var e = this.array[i];
 
     console.log(e['@id']);
-    console.log(e['@id']);
+    console.log(id);
 
     if (e['@id'] === id) {
       return e;

@@ -211,7 +211,7 @@ var transformInput = function(callback) {
   var port = configuration.get('port');
   var location = configuration.get('path');
 
-  var graphName = hostname + ':' + port + location;
+  var graphName = 'http://' + hostname + ':' + port + location;
 
   var create = fs.readFileSync(path.resolve(__dirname, 'rdf', 'createGraph.q')).toString();
   create = create.split('[hostname]').join(graphName);

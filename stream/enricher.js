@@ -185,11 +185,31 @@ util.inherits(EnrichStream, Transform);
 EnrichStream.prototype._transform = function(chunk, enc, cb) {
 
   var change = JSON.parse(chunk.toString());
-  console.log(change)
   change = this.enrich(change);
 
+  var graph = {};
+  var id = change[0].subject;
+
+  graph["@id"] = id;
+  for (var i = change.length - 1; i >= 0; i--) {
+    var triple = change[i];
+
+    graph[triple.predicate] = {
+      "@id": triple.object
+    };
+  }
+
+  var element = {};
+
+  element["http://www.w3.org/ns/prov#generatedAtTime"] = new Date();
+  element["@id"] = id;
+  element["@graph"] = graph;
+
+  this.push(JSON.stringify(element));
+  cb();
+  /*console.log(change)
   var writer = N3.Writer({
-    format: 'N-Triples'
+    format: 'application/nquads'
   });
 
   for (var i = change.length - 1; i >= 0; i--) {
@@ -197,15 +217,18 @@ EnrichStream.prototype._transform = function(chunk, enc, cb) {
   }
   var _this = this;
   writer.end(function(error, result) {
-    console.log(result);
-    jsonld.fromRDF(result, function(err, json) {
+    console.log(result)
+    jsonld.fromRDF(result, {
+      format: 'application/nquads'
+    }, function(err, json) {
       console.log(err);
-      console.log(json);
-      _this.push(json);
+      console.log(JSON.stringify(json));
+      _this.push(JSON.stringify(json));
+      process.exit()
     });
 
   });
-  cb();
+  cb();*/
 };
 
 exports = module.exports = EnrichStream;
