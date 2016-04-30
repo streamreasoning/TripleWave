@@ -17,7 +17,7 @@ function SPARQLStream(options) {
 
   this.endpoint = configuration.get('rdf_query_endpoint');
 
-  this.query = fs.readFileSync(path.resolve(__dirname, '../../', 'rdf', 'selectGraphsWithTS.q')).toString();
+  this.query = fs.readFileSync(path.resolve(__dirname, '../../', 'rdf', 'selectGraphsWithTs.q')).toString();
 
   this.client = new SparqlClient(this.endpoint);
 
