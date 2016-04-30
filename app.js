@@ -25,7 +25,7 @@ var app = express();
 
 //var configuration = require('./config/config.json');
 var configuration = PropertiesReader(path.resolve(__dirname, 'config', 'config.properties'));
-var location = configuration.path;
+var location = configuration.get('path');
 
 // all environments
 app.set('port', configuration.get('port'));
@@ -136,22 +136,6 @@ app.get(location + '/:ts', function(req, res) {
   }
 });
 
-/*app.get('/TripleWave/graph/:ts', function(req, res) {
-  console.log('Searching element with ts ' + req.params.ts);
-
-  var element = server.cache.find(req.params.ts);
-
-  if (element) {
-    res.json({
-      "@graph": element["@graph"]
-    });
-  } else {
-    res.status = 404;
-    res.json({
-      error: "Element not found"
-    });
-  }
-});*/
 
 var loadFile = function(callback) {
 
@@ -313,6 +297,7 @@ app.listen(app.get('port'), function() {
     server.activeStream = new Webstream();
     server.activeStream.pipe(server.enricher);
     server.enricher.pipe(server.cache);
+    console.log(location);
     console.log('TripleWave listening on port ' + app.get('port'));
 
   } else {
