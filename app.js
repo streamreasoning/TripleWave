@@ -108,7 +108,12 @@ if (configuration.get('mode') === 'transform') {
   wss.on('connection', function(ws) {
     console.log('Webscoket openeded');
     server.enricher.on('data', function(data) {
-      ws.send(data.toString());
+      try {
+
+        ws.send(data.toString());
+      } catch (e) {
+        console.log(e);
+      }
     });
   });
 
@@ -154,7 +159,7 @@ app.get('/TripleWave/:ts', function(req, res) {
   }
 });
 
-app.get('/TripleWave/graph/:ts', function(req, res) {
+/*app.get('/TripleWave/graph/:ts', function(req, res) {
   console.log('Searching element with ts ' + req.params.ts);
 
   var element = server.cache.find(req.params.ts);
@@ -169,7 +174,7 @@ app.get('/TripleWave/graph/:ts', function(req, res) {
       error: "Element not found"
     });
   }
-});
+});*/
 
 var loadFile = function(callback) {
 
@@ -348,6 +353,17 @@ app.listen(app.get('port'), function() {
       server.cache = new Cache({});
       server.fromSPARQL = new FromSPARQL();
       server.fromSPARQL.pipe(server.cache);
+
+      if (configuration.get('mode') === "endless") {
+
+        var restartStream = function() {
+          server.cache = new Cache({});
+          server.fromSPARQL = new FromSPARQL();
+          server.fromSPARQL.pipe(server.cache);
+          server.fromSPARQL.on('end', restartStream);
+        };
+        server.fromSPARQL.on('end', restartStream);
+      }
       console.log('TripleWave listening on port ' + app.get('port'));
     });
 

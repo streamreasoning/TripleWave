@@ -47,12 +47,16 @@ function SPARQLStream(options) {
 
     request.post(options, function(error, response, body) {
 
+
       var element = {
         "http://www.w3.org/ns/prov#generatedAtTime": data.ts,
         "@id": data.graph,
         "@graph": JSON.parse(body)
       };
 
+      if (configuration.get("mode") === "endless") {
+        element["http://www.w3.org/ns/prov#generatedAtTime"] = new Date();
+      }
       _this.push(JSON.stringify(element));
       console.log('Next event in ' + data.delta || 0 + 'ms');
       return setTimeout(callback, data.delta || 0);
@@ -64,6 +68,7 @@ function SPARQLStream(options) {
     if (!data.results.bindings) {
       console.log('No graphs retrieved');
       this.push(null);
+
     }
 
 
@@ -87,8 +92,17 @@ function SPARQLStream(options) {
       });
     }
 
+    var _this = this;
     async.eachSeries(cache, timedPush, function() {
       console.log('Stream finished');
+
+      if (configuration.get('modes') === 'endless') {
+        console.log('Endless mode, restarting the stream');
+
+        cache = [];
+      } else {
+        _this.push(null);
+      }
     });
   };
 
@@ -102,24 +116,7 @@ function SPARQLStream(options) {
         _this.handleResults(data);
       });
 
-    /*console.log(this.query)
-    var options = {
-      url: configuration.get('rdf_query_endpoint'),
-      method: 'POST',
-      form: {
-        query: this.query
-      },
-      headers: {
-        Accept: 'application/json'
-      }
-    };
 
-    request.post(options, function(error, response, body) {
-      if (error) throw error;
-
-      console.log(body)
-      _this.handleResults(body);
-    })*/
   };
 
   this.queryEndpoint();

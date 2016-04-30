@@ -3,7 +3,7 @@
  
 . config/config.properties
 
-if [ "$mode" = "replay" ]; then
+if [ "$mode" != "transform" ]; then
    cd fuseki
 #   if [ "$file" = "" ]; then
       java -jar jena-fuseki-server-2.3.1.jar --update --mem /ds &
