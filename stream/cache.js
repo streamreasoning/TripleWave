@@ -99,7 +99,7 @@ Cache.prototype.getAll = function() {
     }
   };
 
-  cache['sld:streamLocation'] = 'ws://' + configuration.get('ws_address');
+  cache['sld:streamLocation'] = configuration.get('ws_address');
   cache['sld:tBoxLocation'] = configuration.get('tbox_stream_location');
 
   for (var i = array.length - 1; i >= 0; i--) {
