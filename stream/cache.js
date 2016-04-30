@@ -77,6 +77,7 @@ Cache.prototype.find = function(ts) {
       return e;
     }
   }
+
   return null;
 };
 
