@@ -78,7 +78,7 @@ if (configuration.get('mode') === 'transform') {
 
   var WebSocketServer = require('ws').Server;
   var wss = new WebSocketServer({
-    port: 8101,
+    port: configuration.get('ws_port'),
     path: configuration.get('ws_stream_location')
   });
 
