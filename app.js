@@ -66,7 +66,7 @@ if (configuration.get('mode') === 'replay' || configuration.get('mode') === 'end
 
     server.fromSPARQL.pipe(res);
     res.on('close', function() {
-      fromSPARQL.unpipe(res);
+      server.fromSPARQL.unpipe(res);
     });
 
   });
