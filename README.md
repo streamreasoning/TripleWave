@@ -16,7 +16,7 @@
 
 In order to install TripleWave just clone the repository
 
-    git clone https://github.com/janez87/TripleWave.git
+    git clone https://github.com/streamreasoning/TripleWave.git
   
 Then simply run
 
