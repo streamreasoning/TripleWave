@@ -25,6 +25,7 @@ var app = express();
 
 //var configuration = require('./config/config.json');
 var configuration = PropertiesReader(path.resolve(__dirname, 'config', 'config.properties'));
+var location = configuration.path;
 
 // all environments
 app.set('port', configuration.get('port'));
@@ -43,30 +44,6 @@ var server = {
 
 };
 
-app.get('/TripleWave/test', function(req, res) {
-
-  var transformer = new Transformer();
-
-  var lines = fs.readFileSync('./r2rml-js/lsd_small.csv').toString().split('\n');
-
-  var data = [];
-  var labels = lines[0].split(',');
-
-  for (l = 1; l < lines.length; l++) {
-    var line = lines[l].split(',');
-    console.log(line);
-    var mmap = {};
-    for (i = 0; i < labels.length; i++) {
-      console.log(line[i]);
-      mmap[labels[i]] = line[i];
-    }
-
-    data.push(mmap);
-  }
-
-  return res.json(data);
-
-});
 
 if (configuration.get('mode') === 'replay' || configuration.get('mode') === 'endless') {
 
@@ -85,7 +62,7 @@ if (configuration.get('mode') === 'replay' || configuration.get('mode') === 'end
     });
   });
 
-  app.get('/TripleWave/stream', function(req, res) {
+  app.get(location + '/stream', function(req, res) {
 
     server.fromSPARQL.pipe(res);
     res.on('close', function() {
@@ -117,7 +94,7 @@ if (configuration.get('mode') === 'transform') {
     });
   });
 
-  app.get('/TripleWave/stream', function(req, res) {
+  app.get(location + '/stream', function(req, res) {
 
     console.log('Connection');
 
@@ -138,11 +115,11 @@ if (configuration.get('mode') === 'transform') {
 
 }
 
-app.get('/TripleWave/sGraph', function(req, res) {
+app.get(location + '/sGraph', function(req, res) {
   return res.json(server.cache.getAll());
 });
 
-app.get('/TripleWave/:ts', function(req, res) {
+app.get(location + '/:ts', function(req, res) {
   console.log('Searching element with ts ' + req.params.ts);
 
   var element = server.cache.find(req.params.ts);
