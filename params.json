@@ -1,0 +1,6 @@
+{
+  "name": "Triplewave",
+  "tagline": "",
+  "body": "# Description\r\n\r\n## Modes\r\n\r\n- Transform\r\n- Replay\r\n- Endless\r\n\r\n# Installation\r\n\r\n## Requirements\r\n- nodejs (tested on version 4.4.0 and 5)\r\n- java 8 (for fuseki, theoretically you can ignore this if you plan to use only the *transform* mode)\r\n\r\nIn order to install TripleWave just clone the repository\r\n\r\n    git clone https://github.com/janez87/TripleWave.git\r\n  \r\nThen simply run\r\n\r\n    npm install\r\n  \r\nfor installing the node depdencies.\r\n\r\n# How to run\r\n\r\n## Configuration file\r\n\r\nThe configuration file is located in `config` folder allows to fully customize the TripleWave installation.\r\n\r\n## Running the examples\r\n\r\n## Run Triplewave with your own transformation and web stream\r\n\r\n## Run Triplewave with your own rdf data\r\n",
+  "note": "Don't delete this file! It's used internally to help with page regeneration."
+}
