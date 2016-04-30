@@ -85,10 +85,6 @@ Cache.prototype.getAll = function() {
 
   var array = _.clone(this.array);
 
-  /*if (array.length === 0) {
-    return {};
-  }*/
-
   var cache = {
     "@context": {
       "sld": "http://streamreasoning.org/ontologies/SLD4TripleWave#",
@@ -103,7 +99,7 @@ Cache.prototype.getAll = function() {
     }
   };
 
-  cache['sld:streamLocation'] = 'ws://' + configuration.get('hostname') + ':' + configuration.get('ws_port') + configuration.get('ws_stream_location');
+  cache['sld:streamLocation'] = 'ws://' + configuration.get('ws_address');
   cache['sld:tBoxLocation'] = configuration.get('tbox_stream_location');
 
   for (var i = array.length - 1; i >= 0; i--) {
