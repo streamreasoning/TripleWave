@@ -4,6 +4,7 @@
   "description": "",
   "main": "app.js",
   "dependencies": {
+    "async": "^2.0.0-rc.3",
     "body-parser": "^1.13.1",
     "errorhandler": "^1.4.0",
     "express": "^4.13.0",
@@ -14,6 +15,7 @@
     "properties-reader": "0.0.15",
     "ps-node": "0.0.5",
     "rdflib": "^0.6.1",
+    "request": "^2.72.0",
     "socket.io": "^1.4.5",
     "socket.io-client": "^1.4.5",
     "sparql-client-2": "github:eddieantonio/node-sparql-client",
