@@ -100,7 +100,9 @@ Cache.prototype.getAll = function() {
   };
 
   cache['sld:streamLocation'] = configuration.get('ws_address');
-  cache['sld:tBoxLocation'] = configuration.get('tbox_stream_location');
+  cache['sld:tBoxLocation'] = {
+    "@id": configuration.get('tbox_stream_location')
+  };
 
   for (var i = array.length - 1; i >= 0; i--) {
     var e = array[i];
