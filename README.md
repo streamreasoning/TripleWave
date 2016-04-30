@@ -8,7 +8,11 @@
 - Replay
 - Endless
 
-## How to install
+## Installation
+
+###Requirements
+- nodejs (tested on version 4.4.0 and 5)
+- java 8 (for fuseki, theoretically you can ignore this if you plan to use only the *transform* mode)
 
 In order to install TripleWave just clone the repository
 
@@ -23,6 +27,8 @@ for installing the node depdencies.
 ## How to run
 
 ### Configuration file
+
+The configuration file is located in `config` folder allows to fully customize the TripleWave installation.
 
 ### Running the examples
 
