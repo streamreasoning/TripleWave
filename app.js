@@ -63,7 +63,7 @@ if (configuration.get('mode') === 'replay' || configuration.get('mode') === 'end
         ws.send(data.toString());
       } catch (e) {
         console.log(e);
-        ws.close();
+
       }
     });
   });
@@ -96,7 +96,7 @@ if (configuration.get('mode') === 'transform') {
         ws.send(data.toString());
       } catch (e) {
         console.log(e);
-        ws.close();
+
       }
     });
   });
@@ -184,7 +184,7 @@ var transformInput = function(callback) {
   var port = configuration.get('port');
   var location = configuration.get('path');
 
-  var graphName = configuration.get('externaladdress') || ('http://' + hostname + ':' + port + location);
+  var graphName = 'http://' + configuration.get('externaladdress') || ('http://' + hostname + ':' + port + location);
 
   var create = fs.readFileSync(path.resolve(__dirname, 'rdf', 'createGraph.q')).toString();
   create = create.split('[hostname]').join(graphName);
