@@ -58,7 +58,13 @@ if (configuration.get('mode') === 'replay' || configuration.get('mode') === 'end
     console.log('Webscoket openeded');
     server.fromSPARQL.on('data', function(data) {
       console.log(data.toString());
-      ws.send(data.toString());
+      try {
+
+        ws.send(data.toString());
+      } catch (e) {
+        console.log(e);
+        ws.close();
+      }
     });
   });
 
@@ -90,6 +96,7 @@ if (configuration.get('mode') === 'transform') {
         ws.send(data.toString());
       } catch (e) {
         console.log(e);
+        ws.close();
       }
     });
   });
