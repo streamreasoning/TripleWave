@@ -31,15 +31,16 @@
     <!-- MAIN CONTENT -->
     <div id="main_content_wrap" class="outer">
       <section id="main_content" class="inner">
-<!--
-        <h1>
-<a id="description" class="anchor" href="#description" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Description</h1>
--->
 <p>TripleWave is a framework to publish RDF streams on the Web.
 It generates RDF streams out of 
 existing Web streams (e.g., Wikipedia change and Twitter streams)
 or 
 RDF datasets containing some time-related annotations.</p>
+
+<!--
+AI: add a description of the TW architecture
+AI: the showcase
+-->
 
 <h1>
 <a id="installation" class="anchor" href="#installation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Installation</h1>
@@ -66,9 +67,11 @@ RDF datasets containing some time-related annotations.</p>
 
 <h2>
 <a id="how-to-run" class="anchor" href="#how-to-run" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>How to run</h2>
+<p>To start TripleWave, run the <code>start.sh</code> file if you are using Mac/Linux, or <code>start.bat</code> if you are using Windows.</p>
+<p>By default, TripleWave starts on the ports 8114 (stream description) and 8124 (stream distribution), and it converts the English Wikipedia <a href="https://www.mediawiki.org/wiki/API:Recent_changes_stream">changes steram</a>. To customise the TripleWave behaviour, see the <a href="#configuration">Configuration</a> section.</p>
 
 <h1>
-<a id="#configuration" class="anchor" href="#configuration" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Configuration</h1>
+<a id="configuration" class="anchor" href="#configuration" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Configuration</h1>
 
 <h2>
 <a id="configuration-file" class="anchor" href="#configuration-file" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Configuration file</h2>
@@ -84,7 +87,6 @@ TripleWave can work on three different modes, depending on input source and the 
 <li>Endless</li>
 </ul>
 
-
 <h2>
 <a id="running-the-examples" class="anchor" href="#running-the-examples" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Running the examples</h2>
 
@@ -93,6 +95,13 @@ TripleWave can work on three different modes, depending on input source and the 
 
 <h2>
 <a id="run-triplewave-with-your-own-rdf-data" class="anchor" href="#run-triplewave-with-your-own-rdf-data" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Run Triplewave with your own rdf data</h2>
+
+<h1>
+<a id="consuming" class="anchor" href="#consuming" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Consuming the TripleWave data</h1>
+<h2>
+<a id="rsp-services" class="anchor" href="#rsp-services" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>RSP service interfaces</h2>
+<h2>
+<a id="linked-data" class="anchor" href="#linked-data" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Linked Data</h2>
 
 <h1>
 <a id="publications" class="anchor" href="#publications" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Publications</h1>
