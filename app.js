@@ -243,6 +243,8 @@ var createNewGraphs = function(callback) {
     var graph = triple.graph.value;
     var key = triple.key.value;
 
+    var pattern = configuration.get('rdf_stream_item_content_pattern');
+    insertQuery = insertQuery.split('[pattern]').join(pattern);
     insertQuery = insertQuery.split('[g]').join(graph);
     insertQuery = insertQuery.split('[k]').join(key);
 
