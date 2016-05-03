@@ -260,7 +260,7 @@ In the following, we explain how to configure TripleWave in order to work in thi
  } 
 }</code></pre>
 <p>The above query is dependent on the input data and this fact is captured by the <em>[rdf_stream_item_pattern]</em> parameter.
-It is necessary to set through the <code>stream_item_pattern</code> parameter in the config file the value with the following constraints:</p>
+It is necessary to set through the <code>rdf_stream_item_pattern</code> parameter in the config file the value with the following constraints:</p>
 <ul>
 <li>it is a Basic Graph pattern;</li>
 <li>it uses two special variables <em>?key</em> and <em>?ts</em> to set respectively the resource used to partition the data and the relative timestamp;</li>
@@ -269,7 +269,7 @@ It is necessary to set through the <code>stream_item_pattern</code> parameter in
 <p>TripleWave assumes that the three constraints are verified, otherwise it may not behave properly. 
 With reference to the supplied example file data.ttl, the stream_item_pattern parameter can be set as:</p>
 <pre><code>
-  stream_item_pattern = ?key &lt;http://knoesis.wright.edu/ssw/ont/sensor-observation.owl#samplingTime&gt; ?time . ?time &lt;http://www.w3.org/2006/time#inXSDDateTime&gt; ?ts
+  rdf_stream_item_pattern = ?key &lt;http://knoesis.wright.edu/ssw/ont/sensor-observation.owl#samplingTime&gt; ?time . ?time &lt;http://www.w3.org/2006/time#inXSDDateTime&gt; ?ts
 </code></pre>
 <p>Consequently, the following query is executed over the input data</p>
   <pre><code>PREFIX sr: &lt;http://streamreasoning.org/&gt;
