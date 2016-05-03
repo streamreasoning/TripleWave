@@ -82,7 +82,65 @@ AI: the showcase
 <h2>
 <a id="run-triplewave-with-your-own-transformation-and-web-stream" class="anchor" href="#run-triplewave-with-your-own-transformation-and-web-stream" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Run Triplewave to convert a Web stream</h2>
 
-<h3>Transform</h3>
+TripleWave allows to generate an RDF stream from an existing stream from the Web.
+As an example, consider the change stream of <a href="https://en.wikipedia.org/wiki/Special:RecentChanges">Wikipedia</a>. 
+This stream features all the changes that occur on the Wikipedia website. It comprehends not only elements related to the creation or modification of pages (e.g., articles and books), but also events related to users (new registrations and blocked users), and discussions among them.
+For example the following JSON excerpt (collected with the API provided <a href="https://github.com/edsu/wikistream">here</a>) shows a fragment of the stream of changes of Wikipedia. In particular, it shows that the user <code>Jmorrison230582</code> modified an article of the <code>English</code> Wikipedia about <code>Naruto: Ultimate Ninja</code>. Furthermore, the delta attribute tell us that the user deleted some words, and the <code>url</code> attribute refers the to the Wikipedia page that describes the event. 
+
+<pre><code>
+{ "page": "Naruto: Ultimate Ninja",
+  "pageUrl": "http://en.wikipedia.org/wiki/Naruto:_Ultimate_Ninja",
+  "url": "https://en.wikipedia.org/w/index.php?diff=669355471&oldid=669215360",
+  "delta": -7, "comment": "/ Characters /",
+  "wikipediaUrl": "http://en.wikipedia.org", 
+  "channel": "#en.wikipedia", "wikipediaShort": "en",
+  "user": "Jmorrison230582", "userUrl": "http://en.wikipedia.org/wiki/User/Jmorrison230582",
+  "unpatrolled": false, "newPage": false, "robot": false,
+  "namespace": "article" }
+</code></pre>
+
+
+<h3>Transformation</h3>
+
+To adapt and transform Web streams to RDF streams we use a generic transformation process that is specified as <a href="http://www.w3.org/TR/r2rml/">R2RML</a> mappings. The example below specifies how a Wikipedia stream update can be mapped to a graph of an RDF stream. This mapping defines first a triple that indicates that the generated subject is of type <code>schema:UpdateAction</code>. The <code>predicateObjectMap</code> clauses add two more triples, one specifying the object of the update (e.g. the modified wiki page) and the author of the update. 
+
+<pre><code>
+:wikiUpdateMap a rr:TriplesMap; rr:logicalTable :wikistream;
+  rr:subjectMap [ rr:template "http://131.175.141.249/TripleWave/{time}"; 
+                  rr:class schema:UpdateAction; rr:graphMap :streamGraph ];
+  rr:predicateObjectMap [rr:predicate schema:object; rr:objectMap [ rr:column "pageUrl" ]];     		   		  
+  rr:predicateObjectMap [rr:predicate schema:agent;  rr:objectMap [ rr:column "userUrl"] ];.
+</code></pre>
+
+Additional mappings can be specified, as in the example below, for providing more information about the user (e.g. user name):
+
+<pre><code>
+:wikiUserMap a rr:TriplesMap; rr:logicalTable :wikistream; 
+  rr:subjectMap   [ rr:column "userUrl"; 
+                    rr:class schema:Person; rr:graphMap :streamGraph ];
+  rr:predicateObjectMap [ rr:predicate schema:name; rr:objectMap	[ rr:column "user" ]];.  
+</code></pre>
+
+A snippet of the resulting RDF Stream graph, serialized in JSON-LD, is shown below. 
+
+<pre><code>
+{"http://www.w3.org/ns/prov#generatedAtTime": "2015-06-30T16:44:59.587Z",
+ "@id": "http://131.175.141.249/TripleWave/1435682699587",
+ "@graph": [ 
+   { "@id": "http://en.wikipedia.org/wiki/User:Jmorrison230582",
+     "@type": "https://schema.org/Person",
+     "name": "Jmorrison230582" },
+   { "@id": "http://131.175.141.249/TripleWave/1435682699587",
+     "@type": "https://schema.org/UpdateAction",
+     "object": {"@id": "http://en.wikipedia.org/wiki/Naruto_Ultimate_Ninja"},
+     "agent":  {"@id": "http://en.wikipedia.org/wiki/User:Jmorrison230582"}
+   }
+ ],
+ "@context": "https://schema.org/"  }
+</code></pre>
+
+
+
 
 <h2>
 <a id="run-triplewave-with-your-own-rdf-data" class="anchor" href="#run-triplewave-with-your-own-rdf-data" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Run Triplewave to stream your own RDF data</h2>
