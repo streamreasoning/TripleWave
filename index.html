@@ -88,12 +88,50 @@ AI: the showcase
 <p>The Replay mode converts an existing dataset (containing some temporal information) in an RDF stream and streams it out. 
 In the following, we explain how to configure TripleWave in order to work in this mode.</p>
 <h4>Set the input file</h4>
-<p>The user has to set the file location of the RDF file to be converted. It can be done by setting the field <code>rdf_file</code> in the config file, </p>
+<p>The user has to set the file location of the RDF file to be converted. It can be done by setting the field <code>rdf_file</code> in the config file, e.g.,</p>
 <pre><code>rdf_file=../rdf/data.ttl
 </code></pre>
-<h4></h4>
-<h4></h4>
-The conversion happens through a set of SPARQL queries that are ran from TripleWave
+<h4>Create the stream item structure</h4>
+<p>The first conversion step consists in specifying how to create the RDF stream items, i.e., a set of pairs <em>(g,t)</em> where <em>g</em> denotes an RDF graph and <em>t</em> a time stamp.</p>
+<p>Being the file imported an RDF graph, i.e., a set of triples, it is necessary to specify the criteria to (1) group the data in RDF graphs and (2) associate a time instant to each of them. It is done through the following parametric SPARQL query: </p> 
+<pre><code>PREFIX sr: &lt;http://streamreasoning.org/&gt;
+<b>WITH</b> sr:sgraph
+<b>INSERT</b>{
+  <em>?g</em> prov:generatedAt <em>?ts</em> ; sr:hasKey <em>?key</em>
+}
+<b>WHERE</b> {
+  <b>GRAPH</b> sr:input{
+  <em>[[user_graph_pattern]]</em>
+  <b>BIND</b> (iri(concat("http://streamreasoning.org/igraph/",afn:localname(<em>?key</em>))) AS <em>?g</em>)
+ } 
+}</code></pre>
+<p>The above query is dependent on the input data and this fact is captured by the <em>[[user_graph_pattern]]</em> parameter.
+It is necessary to set through the <code>user_graph_pattern</code> parameter in the config file the value with the following constraints:</p>
+<ul>
+<li>it is a Basic Graph pattern;</li>
+<li>it uses two special variables <em>?key</em> and <em>?ts</em> to set respectively the resource used to partition the data and the relative timestamp;</li>
+<li>there is a 1:1 relation between <em>?key</em> and <em>?ts</em>, i.e., for each value of <em>?key</em> there is exaclyt one <em>?ts</em> value (and vice versa).
+</ul>
+<p>TripleWave assumes that the three constraints are verified, otherwise it may not behave properly. 
+With reference to the supplied example file data.ttl, the user_graph_pattern parameter can be set as:</p>
+<pre><code>
+  user_graph_pattern = ?key &lt;http://knoesis.wright.edu/ssw/ont/sensor-observation.owl#samplingTime&gt; ?time . ?time &lt;http://www.w3.org/2006/time#inXSDDateTime&gt; ?ts
+</code></pre>
+<p>Consequently, the following query is executed over the input data</p>
+  <pre><code>PREFIX sr: &lt;http://streamreasoning.org/&gt;
+<b>WITH</b> sr:sgraph
+<b>INSERT</b>{
+  <em>?g</em> prov:generatedAt <em>?ts</em> ; sr:hasKey <em>?key</em>
+}
+<b>WHERE</b> {
+  <b>GRAPH</b> sr:input{
+  <em>?key</em> &lt;http://knoesis.wright.edu/ssw/ont/sensor-observation.owl#samplingTime&gt; <em>?time</em> . 
+  <em>?time</em> &lt;http://www.w3.org/2006/time#inXSDDateTime&gt; <em>?ts</em>
+  <b>BIND</b> (iri(concat("http://streamreasoning.org/igraph/",afn:localname(<em>?key</em>))) AS <em>?g</em>)
+ } 
+}</code></pre>
+
+<h4>Fill the stream items</h4>
 
 <h3>Endless</h3>
 
