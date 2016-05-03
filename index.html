@@ -65,22 +65,32 @@ AI: the showcase
 
 <p>for installing the node depdencies.</p>
 
-<h2>
-<a id="how-to-run" class="anchor" href="#how-to-run" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>How to run</h2>
-<p>To start TripleWave, run the <code>start.sh</code> file if you are using Mac/Linux, or <code>start.bat</code> if you are using Windows.</p>
-<p>By default, TripleWave starts on the ports 8114 (stream description) and 8124 (stream distribution), and it converts the English Wikipedia <a href="https://www.mediawiki.org/wiki/API:Recent_changes_stream">changes steram</a>. To customise the TripleWave behaviour, see the <a href="#configuration">Configuration</a> section.</p>
-
 <h1>
-<a id="configuration" class="anchor" href="#configuration" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Configuration</h1>
-<p>TripleWave can work on three different modes, depending on input source and the desired output.</p>
+<a id="how-to-run" class="anchor" href="#how-to-run" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>How to run</h1>
+<p>To start TripleWave, run the <code>start.sh</code> file if you are using Mac/Linux, or <code>start.bat</code> if you are using Windows.</p>
+<p>By default, TripleWave starts on the ports 8114 (stream description) and 8124 (stream distribution), and it converts the English Wikipedia <a href="https://www.mediawiki.org/wiki/API:Recent_changes_stream">changes stream</a>. To customise the TripleWave behaviour, see the <a href="#configuration">Configuration</a> section.</p>
 
 <h2>
 <a id="configuration-file" class="anchor" href="#configuration-file" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Configuration file</h2>
 
 <p>The configuration file is located in <code>config</code> folder allows to fully customize the TripleWave installation.</p>
-
 <h2>
-<a id="run-triplewave-with-your-own-transformation-and-web-stream" class="anchor" href="#run-triplewave-with-your-own-transformation-and-web-stream" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Run Triplewave to convert a Web stream</h2>
+<a id="running-the-examples" class="anchor" href="#running-the-examples" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Running the examples</h2>
+
+<p>TripleWave comes with three scenarios configured and ready to be run: the web stream transformation case, the replay of the Linked Sensor Data dataset and the endless stream of the same dataset</p>
+<p>In order to run the different cases just set the <code>mode</code> to <code>transform</code>, for the first case, <code>replay</code> for the second, and <code>endless</code> for the last</p>
+<p>In all the cases the sgraph of the corresponding stream will be available at</p>
+<code>
+  http://hostname:port/path/sgraph
+</code>
+<p>As configured in the configuration file.</p>
+<p>You can have a look at the stream of the transformation and endless scenario by visiting following links</p>
+<ul>
+  <li>Transformation: <a href="http://131.175.141.249/TripleWave-transform/sgraph">sgraph</a> --  <a href="http://131.175.141.249/TripleWave-transform/stream">HTTP chunk stream</a></li>
+  <li>Endless: <a href="http://131.175.141.249/TripleWave-endless/sgraph">sgraph</a> -- <a href="http://131.175.141.249/TripleWave-endless/stream">HTTP chunk stream</a> (it make take a while since the events in this dataset come in burst every 5 minutes)</li>
+</ul>
+<h2>
+<a id="run-triplewave-with-your-own-transformation-and-web-stream" class="anchor" href="#run-triplewave-with-your-own-transformation-and-web-stream" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Run TripleWave to convert a Web stream</h2>
 
 TripleWave allows to generate an RDF stream from an existing stream from the Web.
 As an example, consider the change stream of <a href="https://en.wikipedia.org/wiki/Special:RecentChanges">Wikipedia</a>. 
@@ -99,7 +109,85 @@ For example the following JSON excerpt (collected with the API provided <a href=
   "namespace": "article" }
 </code></pre>
 
+<p>In order to transform a web stream you need two compoments:</p>
+<ul>
+  <li>A connector to the web stream</li>
+  <li>A R2RML tranformation</li>
+</ul>
 
+<h3>Web Stream Connector</h3>
+<p>A Web Stream connector is a Javascript file that needs to transform data retrieved from some web API to a NodeJS stream.</p>
+<p>Basically what you need to do is to implement a <a href="https://nodejs.org/api/stream.html#stream_class_stream_transform">Transform Stream</a> (a Readable stream is fine too)</p>
+<p>Let's have a look at the Wikipedia example:</p>
+<pre><code>
+var stream = require('stream');
+var util = require('util');
+var wikichanges = require("wikichanges");
+
+var Transform = stream.Transform || require('readable-stream').Transform;
+
+function WikiStream(options) {
+  // allow use without new
+  if (!(this instanceof WikiStream)) {
+    return new WikiStream(options);
+  }
+
+  this.close = false;
+  this.w = new wikichanges.WikiChanges({
+    ircNickname: "jsonLDBot",
+    wikipedias: ["#en.wikipedia"]
+  });
+  _this = this;
+
+  this.w.listen(function(c) {
+    if (!_this.close) {
+      _this.push(JSON.stringify(c));
+    } else {
+      _this.push(null);
+    }
+  });
+
+
+  // init Transform
+  Transform.call(this, options);
+
+
+}
+util.inherits(WikiStream, Transform);
+
+WikiStream.prototype._read = function(enc, cb) {};
+
+WikiStream.prototype.closeStream = function() {
+  this.close = true;
+};
+exports = module.exports = WikiStream;
+</code></pre>
+
+<p>The lines <code>var stream = require('stream');
+var util = require('util');</code> are needed for requiring the stream module and the util module that is needed to implement the inheritance</p>
+<p><code>var Transform = stream.Transform || require('readable-stream').Transform;</code> requires the actual Transform stream class</p>
+<p>Then all the logic is implemented inside the <code>WikiStream</code> function</p>
+<p>Whenever you want to put some data in the stream you need to call the <code>this.push(/* some data*/)</code> function (remember that in the stream you can pass only strings)</p>
+<p>In this particular example the code works like this:</p>
+
+  <p><code>var wikichanges = require("wikichanges");</code> requires the library to connect to the stream of changes of wikipedia</p>
+  <p>The code <pre><code>this.w = new wikichanges.WikiChanges({
+    ircNickname: "jsonLDBot",
+    wikipedias: ["#en.wikipedia"]
+  });</code></pre> opens the stream</p> 
+
+<p>Then with the lines<pre><code>
+  this.w.listen(function(c) {
+    if (!_this.close) {
+      _this.push(JSON.stringify(c));
+    } else {
+      _this.push(null);
+    }
+  });
+</code></pre>
+ we create a handler that put the data in our stream whenever they are available from Wikipedia </p>
+ <p>In order to use a custom stream you need to put your file in the <code>stream/input_stream</code> folder, and then set the <code>stream_name</code> parameter in the configuration file equal to the name of your .js file</p>
+ <p>Furthermore you can use the <code>SampleStream.js</code> file as a stub to create your own connector</p>
 <h3>Transformation</h3>
 
 To adapt and transform Web streams to RDF streams we use a generic transformation process that is specified as <a href="http://www.w3.org/TR/r2rml/">R2RML</a> mappings. The example below specifies how a Wikipedia stream update can be mapped to a graph of an RDF stream. This mapping defines first a triple that indicates that the generated subject is of type <code>schema:UpdateAction</code>. The <code>predicateObjectMap</code> clauses add two more triples, one specifying the object of the update (e.g. the modified wiki page) and the author of the update. 
@@ -139,7 +227,7 @@ A snippet of the resulting RDF Stream graph, serialized in JSON-LD, is shown bel
  "@context": "https://schema.org/"  }
 </code></pre>
 
-
+<p>In order to use your transformation you need to put the r2rml file in the <code>transformation</code> folder and set the <code>stream_mapping</code> parameter as the name of the transformation file</p>
 
 
 <h2>
@@ -199,8 +287,7 @@ With reference to the supplied example file data.ttl, the stream_item_pattern pa
 
 <h3>Fill the stream items</h3>
 
-<h2>
-<a id="running-the-examples" class="anchor" href="#running-the-examples" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Running the examples</h2>
+
 
 <h1>
 <a id="consuming" class="anchor" href="#consuming" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Consuming the TripleWave data</h1>
