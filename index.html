@@ -293,6 +293,20 @@ With reference to the supplied example file data.ttl, the stream_item_pattern pa
 <a id="consuming" class="anchor" href="#consuming" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Consuming the TripleWave data</h1>
 <h2>
 <a id="rsp-services" class="anchor" href="#rsp-services" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>RSP service interfaces</h2>
+<p>The user can consume a triple wave stream by exploiting RSP services interfaces.
+The RSP services offers simple HTTP call to interact with an RSP and register stream, register query and consume results.</p>
+The user can interact with RSP (in this we exemplify the operation flow using the C-SPARQL engine) and consume the stream as follow:
+  <ul>
+    <li>Identifies the stream by its IRI of the stream (which is the URL of the sGraph)</li>
+    <li>Register the new stream in the C-SPARQL engine using an HTTP PUT Call (&ltserveraddress&gt/streams) to the RSP Sevices interfaces with the parameter streamIRI in the body (it represents the unique ID of the stream in the engine).</li>
+    <li>RSP Services looks at the sGraph URL, parses it and gets the information regarding the TBox and WebSocket</li>
+    <li>The TBox (if available) is associated to the stream. </li>
+    <li>A WebSocket connection is established and the data flows into C-SPARQL</li>
+    <li>Register a new query for the registered stream using an HTTP PUT call &ltserveraddress&gt/streams/&ltqueryName&gt with the query in the body as raw string</li>
+    <li>The TBox is loaded into the reasoner (if available) associated to the query</li>
+    <li>The query is performed on the flowing data.</li>
+  </ul>
+</p>
 <h2>
 <a id="linked-data" class="anchor" href="#linked-data" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Linked Data</h2>
 
