@@ -55,7 +55,7 @@ AI: the showcase
 
 <p>In order to install TripleWave just clone the repository</p>
 
-<pre><code>git clone https://github.com/janez87/TripleWave.git
+<pre><code>git clone https://github.com/streamreasoning/TripleWave.git
 </code></pre>
 
 <p>Then simply run</p>
@@ -80,12 +80,23 @@ AI: the showcase
 
 <h2>
 <a id="modes" class="anchor" href="#modes" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Modes</h2>
-TripleWave can work on three different modes, depending on input source and the desired output.
-<ul>
-<li>Transform</li>
-<li>Replay</li>
-<li>Endless</li>
-</ul>
+<p>TripleWave can work on three different modes, depending on input source and the desired output.</p>
+
+<h3>Transform</h3>
+
+<h3>Replay</h3>
+<p>The Replay mode converts an existing dataset (containing some temporal information) in an RDF stream and streams it out. 
+In the following, we explain how to configure TripleWave in order to work in this mode.</p>
+<h4>Set the input file</h4>
+<p>The user has to set the file location of the RDF file to be converted. It can be done by setting the field <code>rdf_file</code> in the config file, </p>
+<pre><code>rdf_file=../rdf/data.ttl
+</code></pre>
+<h4></h4>
+<h4></h4>
+The conversion happens through a set of SPARQL queries that are ran from TripleWave
+
+<h3>Endless</h3>
+
 
 <h2>
 <a id="running-the-examples" class="anchor" href="#running-the-examples" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Running the examples</h2>
