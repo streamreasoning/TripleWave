@@ -204,8 +204,10 @@ var transformInput = function(callback) {
   request.post(options, function(error) {
     if (error) return callback(error);
 
+    var pattern = configuration.get('rdf_graph_pattern');
     var query = fs.readFileSync('./rdf/insertQuery.q').toString();
     query = query.split('[graphname]').join(graphName);
+    query = query.split('[pattern]').join(pattern);
 
     console.log(query);
     options.form.update = query;
