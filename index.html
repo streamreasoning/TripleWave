@@ -255,11 +255,11 @@ In the following, we explain how to configure TripleWave in order to work in thi
 }
 <b>WHERE</b> {
   <b>GRAPH</b> sr:input{
-  <em>[[stream_item_pattern]]</em>
+  <em>[rdf_stream_item_pattern]</em>
   <b>BIND</b> (iri(concat("http://streamreasoning.org/igraph/",afn:localname(<em>?key</em>))) AS <em>?g</em>)
  } 
 }</code></pre>
-<p>The above query is dependent on the input data and this fact is captured by the <em>[[stream_item_pattern]]</em> parameter.
+<p>The above query is dependent on the input data and this fact is captured by the <em>[rdf_stream_item_pattern]</em> parameter.
 It is necessary to set through the <code>stream_item_pattern</code> parameter in the config file the value with the following constraints:</p>
 <ul>
 <li>it is a Basic Graph pattern;</li>
