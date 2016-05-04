@@ -1,20 +1,344 @@
----
-layout: default
----
+<!DOCTYPE html>
+<html>
 
-<nav id='sidebar'>
-	{% include nav.html %}
-</nav>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="Triplewave : ">
 
-<section id='content'>
-<h1>TripleWave</h1>
-<h2>An open-source tool to bring RDF streams on the Web</h2>
-{% for post in site.posts %}
-  <article class='{{ post.type }}'>
-    <a name='{{ post.url }}' href='#{{ post.url }}'><h2>{% if post.type %}<code><b>{{ post.type }}</b> {{ post.path }}</code> {% endif %}{{ post.title }}</h2></a>
-    <section class='body'>
-      {{ post.content }}
-    </section>
-  </article>
-{% endfor %}
-</section>
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Triplewave</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/streamreasoning/TripleWave">View on GitHub</a>
+
+          <h1 id="project_title">TripleWave</h1>
+          <h2 id="project_tagline">An open-source tool to bring RDF streams on the Web</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/streamreasoning/TripleWave/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/streamreasoning/TripleWave/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+<p>TripleWave is a framework to publish RDF streams on the Web.
+It generates RDF streams out of 
+existing Web streams (e.g., Wikipedia change and Twitter streams)
+or 
+RDF datasets containing some time-related annotations.</p>
+
+<!--
+AI: add a description of the TW architecture
+AI: the showcase
+-->
+
+<h1>
+<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Installation</h1>
+
+<h2>
+<a id="requirements" class="anchor" href="#requirements" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Requirements</h2>
+
+<ul>
+<li>nodejs (tested on version 4.4.0 and 5)</li>
+<li>java 8 (for fuseki, theoretically you can ignore this if you plan to use only the <em>transform</em> mode)</li>
+</ul>
+
+<p>In order to install TripleWave just clone the repository</p>
+
+<pre><code>git clone https://github.com/streamreasoning/TripleWave.git
+</code></pre>
+
+<p>Then simply run</p>
+
+<pre><code>npm install
+</code></pre>
+
+<p>for installing the node depdencies.</p>
+
+<h1>
+<a id="how-to-run" class="anchor" href="#how-to-run" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>How to run</h1>
+<p>To start TripleWave, run the <code>start.sh</code> file if you are using Mac/Linux, or <code>start.bat</code> if you are using Windows.</p>
+<p>By default, TripleWave starts on the ports 8114 (stream description) and 8124 (stream distribution), and it converts the English Wikipedia <a href="https://www.mediawiki.org/wiki/API:Recent_changes_stream">changes stream</a>. To customise the TripleWave behaviour, see the <a href="#configuration">Configuration</a> section.</p>
+
+<h2>
+<a id="configuration-file" class="anchor" href="#configuration-file" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Configuration file</h2>
+
+<p>The configuration file is located in <code>config</code> folder allows to fully customize the TripleWave installation.</p>
+<h2>
+<a id="running-the-examples" class="anchor" href="#running-the-examples" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Running the examples</h2>
+
+<p>TripleWave comes with three scenarios configured and ready to be run: the web stream transformation case, the replay of the Linked Sensor Data dataset and the endless stream of the same dataset</p>
+<p>In order to run the different cases just set the <code>mode</code> to <code>transform</code>, for the first case, <code>replay</code> for the second, and <code>endless</code> for the last</p>
+<p>In all the cases the sgraph of the corresponding stream will be available at</p>
+<code>
+  http://hostname:port/path/sgraph
+</code>
+<p>As configured in the configuration file.</p>
+<p>You can have a look at the stream of the transformation and endless scenario by visiting following links</p>
+<ul>
+  <li>Transformation: <a href="http://131.175.141.249/TripleWave-transform/sgraph">sgraph</a> --  <a href="http://131.175.141.249/TripleWave-transform/stream">HTTP chunk stream</a></li>
+  <li>Endless: <a href="http://131.175.141.249/TripleWave-endless/sgraph">sgraph</a> -- <a href="http://131.175.141.249/TripleWave-endless/stream">HTTP chunk stream</a> (it make take a while since the events in this dataset come in burst every 5 minutes)</li>
+</ul>
+<h2>
+<a id="run-triplewave-with-your-own-transformation-and-web-stream" class="anchor" href="#run-triplewave-with-your-own-transformation-and-web-stream" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Run TripleWave to convert a Web stream</h2>
+
+TripleWave allows to generate an RDF stream from an existing stream from the Web.
+As an example, consider the change stream of <a href="https://en.wikipedia.org/wiki/Special:RecentChanges">Wikipedia</a>. 
+This stream features all the changes that occur on the Wikipedia website. It comprehends not only elements related to the creation or modification of pages (e.g., articles and books), but also events related to users (new registrations and blocked users), and discussions among them.
+For example the following JSON excerpt (collected with the API provided <a href="https://github.com/edsu/wikistream">here</a>) shows a fragment of the stream of changes of Wikipedia. In particular, it shows that the user <code>Jmorrison230582</code> modified an article of the <code>English</code> Wikipedia about <code>Naruto: Ultimate Ninja</code>. Furthermore, the delta attribute tell us that the user deleted some words, and the <code>url</code> attribute refers the to the Wikipedia page that describes the event. 
+
+<pre><code>
+{ "page": "Naruto: Ultimate Ninja",
+  "pageUrl": "http://en.wikipedia.org/wiki/Naruto:_Ultimate_Ninja",
+  "url": "https://en.wikipedia.org/w/index.php?diff=669355471&oldid=669215360",
+  "delta": -7, "comment": "/ Characters /",
+  "wikipediaUrl": "http://en.wikipedia.org", 
+  "channel": "#en.wikipedia", "wikipediaShort": "en",
+  "user": "Jmorrison230582", "userUrl": "http://en.wikipedia.org/wiki/User/Jmorrison230582",
+  "unpatrolled": false, "newPage": false, "robot": false,
+  "namespace": "article" }
+</code></pre>
+
+<p>In order to transform a web stream you need two compoments:</p>
+<ul>
+  <li>A connector to the web stream</li>
+  <li>A R2RML tranformation</li>
+</ul>
+
+<h3>Web Stream Connector</h3>
+<p>A Web Stream connector is a Javascript file that needs to transform data retrieved from some web API to a NodeJS stream.</p>
+<p>Basically what you need to do is to implement a <a href="https://nodejs.org/api/stream.html#stream_class_stream_transform">Transform Stream</a> (a Readable stream is fine too)</p>
+<p>Let's have a look at the Wikipedia example:</p>
+<pre><code>
+var stream = require('stream');
+var util = require('util');
+var wikichanges = require("wikichanges");
+
+var Transform = stream.Transform || require('readable-stream').Transform;
+
+function WikiStream(options) {
+  // allow use without new
+  if (!(this instanceof WikiStream)) {
+    return new WikiStream(options);
+  }
+
+  this.close = false;
+  this.w = new wikichanges.WikiChanges({
+    ircNickname: "jsonLDBot",
+    wikipedias: ["#en.wikipedia"]
+  });
+  _this = this;
+
+  this.w.listen(function(c) {
+    if (!_this.close) {
+      _this.push(JSON.stringify(c));
+    } else {
+      _this.push(null);
+    }
+  });
+
+
+  // init Transform
+  Transform.call(this, options);
+
+
+}
+util.inherits(WikiStream, Transform);
+
+WikiStream.prototype._read = function(enc, cb) {};
+
+WikiStream.prototype.closeStream = function() {
+  this.close = true;
+};
+exports = module.exports = WikiStream;
+</code></pre>
+
+<p>The lines <code>var stream = require('stream');
+var util = require('util');</code> are needed for requiring the stream module and the util module that is needed to implement the inheritance</p>
+<p><code>var Transform = stream.Transform || require('readable-stream').Transform;</code> requires the actual Transform stream class</p>
+<p>Then all the logic is implemented inside the <code>WikiStream</code> function</p>
+<p>Whenever you want to put some data in the stream you need to call the <code>this.push(/* some data*/)</code> function (remember that in the stream you can pass only strings)</p>
+<p>In this particular example the code works like this:</p>
+
+  <p><code>var wikichanges = require("wikichanges");</code> requires the library to connect to the stream of changes of wikipedia</p>
+  <p>The code <pre><code>this.w = new wikichanges.WikiChanges({
+    ircNickname: "jsonLDBot",
+    wikipedias: ["#en.wikipedia"]
+  });</code></pre> opens the stream</p> 
+
+<p>Then with the lines<pre><code>
+  this.w.listen(function(c) {
+    if (!_this.close) {
+      _this.push(JSON.stringify(c));
+    } else {
+      _this.push(null);
+    }
+  });
+</code></pre>
+ we create a handler that put the data in our stream whenever they are available from Wikipedia </p>
+ <p>In order to use a custom stream you need to put your file in the <code>stream/input_stream</code> folder, and then set the <code>stream_name</code> parameter in the configuration file equal to the name of your .js file</p>
+ <p>Furthermore you can use the <code>SampleStream.js</code> file as a stub to create your own connector</p>
+<h3>Transformation</h3>
+
+To adapt and transform Web streams to RDF streams we use a generic transformation process that is specified as <a href="http://www.w3.org/TR/r2rml/">R2RML</a> mappings. The example below specifies how a Wikipedia stream update can be mapped to a graph of an RDF stream. This mapping defines first a triple that indicates that the generated subject is of type <code>schema:UpdateAction</code>. The <code>predicateObjectMap</code> clauses add two more triples, one specifying the object of the update (e.g. the modified wiki page) and the author of the update. 
+
+<pre><code>
+:wikiUpdateMap a rr:TriplesMap; rr:logicalTable :wikistream;
+  rr:subjectMap [ rr:template "http://131.175.141.249/TripleWave/{time}"; 
+                  rr:class schema:UpdateAction; rr:graphMap :streamGraph ];
+  rr:predicateObjectMap [rr:predicate schema:object; rr:objectMap [ rr:column "pageUrl" ]];     		   		  
+  rr:predicateObjectMap [rr:predicate schema:agent;  rr:objectMap [ rr:column "userUrl"] ];.
+</code></pre>
+
+Additional mappings can be specified, as in the example below, for providing more information about the user (e.g. user name):
+
+<pre><code>
+:wikiUserMap a rr:TriplesMap; rr:logicalTable :wikistream; 
+  rr:subjectMap   [ rr:column "userUrl"; 
+                    rr:class schema:Person; rr:graphMap :streamGraph ];
+  rr:predicateObjectMap [ rr:predicate schema:name; rr:objectMap	[ rr:column "user" ]];.  
+</code></pre>
+
+A snippet of the resulting RDF Stream graph, serialized in JSON-LD, is shown below. 
+
+<pre><code>
+{"http://www.w3.org/ns/prov#generatedAtTime": "2015-06-30T16:44:59.587Z",
+ "@id": "http://131.175.141.249/TripleWave/1435682699587",
+ "@graph": [ 
+   { "@id": "http://en.wikipedia.org/wiki/User:Jmorrison230582",
+     "@type": "https://schema.org/Person",
+     "name": "Jmorrison230582" },
+   { "@id": "http://131.175.141.249/TripleWave/1435682699587",
+     "@type": "https://schema.org/UpdateAction",
+     "object": {"@id": "http://en.wikipedia.org/wiki/Naruto_Ultimate_Ninja"},
+     "agent":  {"@id": "http://en.wikipedia.org/wiki/User:Jmorrison230582"}
+   }
+ ],
+ "@context": "https://schema.org/"  }
+</code></pre>
+
+<p>In order to use your transformation you need to put the r2rml file in the <code>transformation</code> folder and set the <code>stream_mapping</code> parameter as the name of the transformation file</p>
+
+
+<h2>
+<a id="run-triplewave-with-your-own-rdf-data" class="anchor" href="#run-triplewave-with-your-own-rdf-data" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Run Triplewave to stream your own RDF data</h2>
+<p>TripleWave can convert an existing dataset (containing some temporal information) in an RDF stream and can stream it out. 
+In the following, we explain how to configure TripleWave in order to work in this setting.</p>
+<h3>Set the execution mode and the input file</h3>
+<p>In order to stream your own RDF file, you should first set one of the two execution modes in the <code>mode</code> parameter of the configuration file.</p>
+<ul>
+<li>Replay</li>
+<li>Endless</li>
+</ul>
+
+<p>Moreover, you should set the file location of the RDF file to be converted. It can be done by filling the field <code>rdf_file</code> in the config file, e.g.,</p>
+<pre><code>rdf_file=../rdf/data.ttl
+</code></pre>
+
+<h3>Create the stream item structure</h3>
+<p>The first conversion step consists in specifying how to create the RDF stream items, i.e., a set of pairs <em>(g,t)</em> where <em>g</em> denotes an RDF graph and <em>t</em> a time stamp.</p>
+<p>Being the file imported an RDF graph, i.e., a set of triples, it is necessary to specify the criteria to (1) group the data in RDF graphs and (2) associate a time instant to each of them. It is done through the following parametric SPARQL query: </p> 
+<pre><code>PREFIX sr: &lt;http://streamreasoning.org/&gt;
+<b>WITH</b> sr:sgraph
+<b>INSERT</b>{
+  <em>?g</em> prov:generatedAt <em>?ts</em> ; sr:hasKey <em>?key</em>
+}
+<b>WHERE</b> {
+  <b>GRAPH</b> sr:input{
+  <em>[rdf_stream_item_pattern]</em>
+  <b>BIND</b> (iri(concat("http://streamreasoning.org/igraph/",afn:localname(<em>?key</em>))) AS <em>?g</em>)
+ } 
+}</code></pre>
+<p>The above query is dependent on the input data and this fact is captured by the <em>[rdf_stream_item_pattern]</em> parameter.
+It is necessary to set through the <code>rdf_stream_item_pattern</code> parameter in the config file the value with the following constraints:</p>
+<ul>
+<li>it is a Basic Graph pattern;</li>
+<li>it uses two special variables <em>?key</em> and <em>?ts</em> to set respectively the resource used to partition the data and the relative timestamp;</li>
+<li>there is a 1:1 relation between <em>?key</em> and <em>?ts</em>, i.e., for each value of <em>?key</em> there is exaclyt one <em>?ts</em> value (and vice versa).
+</ul>
+<p>TripleWave assumes that the three constraints are verified, otherwise it may not behave properly. 
+With reference to the supplied example file data.ttl, the stream_item_pattern parameter can be set as:</p>
+<pre><code>
+  rdf_stream_item_pattern = ?key &lt;http://knoesis.wright.edu/ssw/ont/sensor-observation.owl#samplingTime&gt; ?time . ?time &lt;http://www.w3.org/2006/time#inXSDDateTime&gt; ?ts
+</code></pre>
+<p>Consequently, the following query is executed over the input data</p>
+  <pre><code>PREFIX sr: &lt;http://streamreasoning.org/&gt;
+<b>WITH</b> sr:sgraph
+<b>INSERT</b>{
+  <em>?g</em> prov:generatedAt <em>?ts</em> ; sr:hasKey <em>?key</em>
+}
+<b>WHERE</b> {
+  <b>GRAPH</b> sr:input{
+  <em>?key</em> &lt;http://knoesis.wright.edu/ssw/ont/sensor-observation.owl#samplingTime&gt; <em>?time</em> . 
+  <em>?time</em> &lt;http://www.w3.org/2006/time#inXSDDateTime&gt; <em>?ts</em>
+  <b>BIND</b> (iri(concat("http://streamreasoning.org/igraph/",afn:localname(<em>?key</em>))) AS <em>?g</em>)
+ } 
+}</code></pre>
+
+<h3>Fill the stream items</h3>
+
+
+
+<h1>
+<a id="consuming" class="anchor" href="#consuming" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Consuming the TripleWave data</h1>
+<h2>
+<a id="rsp-services" class="anchor" href="#rsp-services" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>RSP service interfaces</h2>
+<p>The user can consume a triple wave stream by exploiting RSP services interfaces.
+The RSP services offers simple HTTP call to interact with an RSP and register stream, register query and consume results.</p>
+The user can interact with RSP (in this we exemplify the operation flow using the C-SPARQL engine) and consume the stream as follow:
+  <ul>
+    <li>Identifies the stream by its IRI of the stream (which is the URL of the sGraph)</li>
+    <li>Register the new stream in the C-SPARQL engine using an HTTP PUT Call (&ltserveraddress&gt/streams) to the RSP Sevices interfaces with the parameter streamIRI in the body (it represents the unique ID of the stream in the engine).</li>
+    <li>RSP Services looks at the sGraph URL, parses it and gets the information regarding the TBox and WebSocket</li>
+    <li>The TBox (if available) is associated to the stream. </li>
+    <li>A WebSocket connection is established and the data flows into C-SPARQL</li>
+    <li>Register a new query for the registered stream using an HTTP PUT call &ltserveraddress&gt/streams/&ltqueryName&gt with the query in the body as raw string</li>
+    <li>The TBox is loaded into the reasoner (if available) associated to the query</li>
+    <li>The query is performed on the flowing data.</li>
+  </ul>
+</p>
+<p>
+  <a href="http://streamreasoning.org/TripleWave/Running_Examples.zip">Here</a> is available a compressed file containing running examples that exploit online RDF streams created with TriplWave and the C-SPARQL Engine (via RSP Services).
+</p>
+<p>  
+  The source code of the RSP Services can be found on <a href="http://github.com/streamreasoning/rsp-services-client-example/tree/triplewave">github</a>.
+</p>
+<p> 
+  The source code of the running examples client can be found on <a href="http://github.com/streamreasoning/rsp-services-csparql">github</a>
+</p>
+<h1>
+<a id="publications" class="anchor" href="#publications" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Publications</h1>
+<ul>
+<li>Andrea Mauri, Jean-Paul Calbimonte, Daniele Dell'Aglio, Marco Balduini, Emanuele Della Valle, Karl Aberer:
+<a href="http://ceur-ws.org/Vol-1486/paper_95.pdf">Where Are the RDF Streams?: On Deploying RDF Streams on the Web of Data with TripleWave</a>.
+Poster at International Semantic Web Conference 2015</li>
+</ul>
+
+<h1>Licence</h1>
+TripleWave is released under Apache Public Licence 2.0.
+
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Triplewave maintained by <a href="https://github.com/streamreasoning">streamreasoning</a></p>
+        <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+
+
+  </body>
+</html>
