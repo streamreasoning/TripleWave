@@ -12,14 +12,19 @@ TripleWave allows to generate an RDF stream from an existing stream from the Web
 For example the following JSON excerpt (collected with the API provided [here](https://github.com/edsu/wikistream)) shows a fragment of the stream of changes of Wikipedia. In particular, it shows that the user `Jmorrison230582` modified an article of the English Wikipedia about `Naruto: Ultimate Ninja`. Furthermore, the delta attribute tell us that the user deleted some words, and the `url` attribute refers the to the Wikipedia page that describes the event.
 
 
-    { "page": "Naruto: Ultimate Ninja",
+    { 
+      "page": "Naruto: Ultimate Ninja",
       "pageUrl": "http://en.wikipedia.org/wiki/Naruto:_Ultimate_Ninja",
       "url": "https://en.wikipedia.org/w/index.php?diff=669355471&oldid=669215360",
       "delta": -7, "comment": "/ Characters /",
       "wikipediaUrl": "http://en.wikipedia.org", 
-      "channel": "#en.wikipedia", "wikipediaShort": "en",
-      "user": "Jmorrison230582", "userUrl": "http://en.wikipedia.org/wiki/User/Jmorrison230582",
-      "unpatrolled": false, "newPage": false, "robot": false,
+      "channel": "#en.wikipedia", 
+      "wikipediaShort": "en",
+      "user": "Jmorrison230582", 
+      "userUrl": "http://en.wikipedia.org/wiki/User/Jmorrison230582",
+      "unpatrolled": false, 
+      "newPage": false, 
+      "robot": false,
       "namespace": "article" 
     }
 
@@ -123,8 +128,10 @@ To adapt and transform Web streams to RDF streams we use a generic transformatio
     :wikiUpdateMap a rr:TriplesMap; rr:logicalTable :wikistream;
       rr:subjectMap [ rr:template "http://131.175.141.249/TripleWave/{time}"; 
                       rr:class schema:UpdateAction; rr:graphMap :streamGraph ];
-      rr:predicateObjectMap [rr:predicate schema:object; rr:objectMap [ rr:column "pageUrl" ]];     		   		  
-      rr:predicateObjectMap [rr:predicate schema:agent;  rr:objectMap [ rr:column "userUrl"] ];.
+      rr:predicateObjectMap [rr:predicate schema:object; 
+                             rr:objectMap [ rr:column "pageUrl" ]];     		   		  
+      rr:predicateObjectMap [rr:predicate schema:agent;  
+                             rr:objectMap [ rr:column "userUrl"] ];.
 
 
 Additional mappings can be specified, as in the example below, for providing more information about the user (e.g. user name):
@@ -133,7 +140,8 @@ Additional mappings can be specified, as in the example below, for providing mor
      :wikiUserMap a rr:TriplesMap; rr:logicalTable :wikistream; 
        rr:subjectMap   [ rr:column "userUrl"; 
                     rr:class schema:Person; rr:graphMap :streamGraph ];
-       rr:predicateObjectMap [ rr:predicate schema:name; rr:objectMap	[ rr:column "user" ]];.  
+       rr:predicateObjectMap [ rr:predicate schema:name; 
+                               rr:objectMap [ rr:column "user" ]];.  
 
 
 A snippet of the resulting RDF Stream graph, serialized in JSON-LD, is shown below.
