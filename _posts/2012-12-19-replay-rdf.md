@@ -44,7 +44,7 @@ The above query is dependent on the input data and this fact is captured by the 
 * it uses two special variables *?key* and *?ts* to set respectively the resource used to partition the data and the relative timestamp;
 * there is a 1:1 relation between *?key* and *?ts*, i.e., for each value of *?key* there is exactly one *?ts* value (and vice versa). 
 
-TripleWave assumes that the three constraints are verified, otherwise it may not behave properly. With reference to the supplied example file data.ttl, the stream_item_pattern parameter can be set as (**in one line**):
+TripleWave assumes that the three constraints are verified, otherwise it may not behave properly. With reference to the supplied example file data.ttl, the `stream_item_pattern` parameter can be set as (**in one line**):
 
 
     rdf_stream_item_pattern = 
@@ -85,4 +85,26 @@ This operation is done with a set of SPARQL queries in the form:
 [g] denotes a stream element identifier, while [stream_item_content_pattern] indicates the Basic Graph Pattern that extracts the window content. 
 
 [g] is automatically set by the TripleWave, while [stream_item_content_pattern] is loaded by the config file. That means, you should set the [stream_item_content_pattern] value through the 
-`stream_item_content_pattern` parameter.
+`stream_item_content_pattern` parameter. 
+As before, the special variable *?key* has to be used to compose the basic graph pattern.
+
+Continuing the example, `stream_item_content_pattern` parameter can be set as:
+
+
+    rdf_stream_item_pattern = 
+      ?key ?p ?o. 
+
+Consequently, the following example query is executed over the input data
+
+    PREFIX sr: <http://streamreasoning.org/>
+    WITH <http://example.org/data.ttl#item05>
+    INSERT{
+		<http://example.org/data.ttl#key5> ?p ?o. 
+    }
+    WHERE {
+		GRAPH sr:input{
+			<http://example.org/data.ttl#key5> ?p ?o. 
+		}
+    }
+
+It is worth noting that TripleWave automatically replace the ?key variable with the value related to the graph it has to be created.
