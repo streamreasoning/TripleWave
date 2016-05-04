@@ -65,3 +65,22 @@ Consequently, the following query is executed over the input data
     }
 
 #### Fill the stream items
+The previous step creates the stream item structure, with element names and relative time instants.
+To complete the conversion, it is necessary to fill the stream elements with their content.
+This operation is done with a set of SPARQL queries in the form:
+
+    PREFIX sr: <http://streamreasoning.org/>
+    WITH [g]
+    INSERT{
+      [stream_item_content_pattern]
+    }
+    WHERE {
+		GRAPH sr:input{
+			[stream_item_content_pattern]
+		}
+    }
+
+[g] denotes a stream element identifier, while [stream_item_content_pattern] indicates the Basic Graph Pattern that extracts the window content. 
+
+[g] is automatically set by the TripleWave, while [stream_item_content_pattern] is loaded by the config file. That means, you should set the [stream_item_content_pattern] value through the 
+`stream_item_content_pattern` parameter.
