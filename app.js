@@ -56,7 +56,7 @@ if (configuration.get('mode') === 'replay' || configuration.get('mode') === 'end
   wss.on('connection', function(ws) {
 
     console.log('Webscoket openeded');
-    server.fromSPARQL.on('data', function(data) {
+    /*server.fromSPARQL.on('data', function(data) {
       console.log(data.toString());
       try {
 
@@ -65,7 +65,30 @@ if (configuration.get('mode') === 'replay' || configuration.get('mode') === 'end
         console.log(e);
 
       }
+    });*/
+
+    var pushData = function(data) {
+      var _this = this;
+      try {
+        ws.send(data.toString());
+      } catch (e) {
+        server.fromSPARQL.removeListener('data', pushData);
+
+      }
+    };
+
+    ws.on('error', function(e) {
+      console.log(e);
+      ws.close();
     });
+
+    try {
+
+      server.fromSPARQL.on('data', pushData);
+    } catch (e) {
+      console.log(e);
+    }
+
   });
 
   app.get(location + '/stream', function(req, res) {
@@ -90,7 +113,7 @@ if (configuration.get('mode') === 'transform') {
 
   wss.on('connection', function(ws) {
     console.log('Webscoket openeded');
-    server.enricher.on('data', function(data) {
+    /*server.enricher.on('data', function(data) {
       try {
 
         ws.send(data.toString());
@@ -98,7 +121,32 @@ if (configuration.get('mode') === 'transform') {
         console.log(e);
 
       }
+    });*/
+
+    var pushData = function(data) {
+      var _this = this;
+      try {
+        ws.send(data.toString());
+      } catch (e) {
+        console.log(e);
+        console.log('Closing the socket');
+        server.enricher.removeListener('data', pushData);
+
+      }
+    };
+
+    ws.on('error', function(e) {
+      console.log('Error on the websocket');
+      console.log(e);
+      ws.close();
     });
+
+    try {
+
+      server.enricher.on('data', pushData);
+    } catch (e) {
+      console.log(e);
+    }
   });
 
   app.get(location + '/stream', function(req, res) {
