@@ -1,0 +1,27 @@
+<p>To start TripleWave, run the <code>start.sh</code> file if you are using Mac/Linux, or <code>start.bat</code> if you are using Windows.</p>
+
+<p>By default, TripleWave starts on the ports 8114 (stream description) and 8124 (stream distribution), and it converts the English Wikipedia <a href="https://www.mediawiki.org/wiki/API:Recent_changes_stream">changes stream</a>. To customize the TripleWave behavior, see the Configuration section.</p>
+
+<h3 id="configuration-file">Configuration file</h3>
+
+<p>The configuration file is located in the <code>config</code> folder allows to fully customize the TripleWave installation.</p>
+
+<h3 id="running-the-examples">Running the examples</h3>
+
+<p>TripleWave comes with three scenarios configured and ready to be run: the web stream transformation case, the replay of the Linked Sensor Data dataset and the endless stream of the same dataset</p>
+
+<p>In order to run the different cases just set the <code>mode</code> to <code>transform</code>, for the first case, <code>replay</code> for the second, and <code>endless</code> for the <code>last</code>.</p>
+
+<p>In all the cases the sgraph of the corresponding stream will be available at</p>
+
+<pre><code>http://hostname:port/path/sgraph
+</code></pre>
+
+<p>As configured in the configuration file.</p>
+
+<p>You can have a look at the stream of the transformation and endless scenario by visiting following links:</p>
+
+<ul>
+  <li>Transformation: <a href="http://131.175.141.249/TripleWave-transform/sgraph">sgraph</a> – <a href="http://131.175.141.249/TripleWave-transform/stream">HTTP chunk stream</a></li>
+  <li>Endless: <a href="http://131.175.141.249/TripleWave-endless/sgraph">sgraph</a> – <a href="http://131.175.141.249/TripleWave-endless/stream">HTTP chunk stream</a> (it make take a while since the events in this dataset come in burst every 5 minutes)</li>
+</ul>
