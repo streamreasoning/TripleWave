@@ -1,1 +1,1 @@
-CREATE GRAPH <http://example.org/sgraph>
+CREATE GRAPH <http://example.org/sgraph> 
