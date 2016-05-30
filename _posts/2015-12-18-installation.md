@@ -20,6 +20,6 @@ Then simply run
 
 for installing the node dependencies.
 
-#### Possible bug
+#### Possible bugs
 
 Please ignore the compilation error give by the dependency `node-icu-charset-detector`
