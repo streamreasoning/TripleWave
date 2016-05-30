@@ -19,3 +19,7 @@ Then simply run
     npm install
 
 for installing the node dependencies.
+
+#### Possible bug
+
+Please ignore the compilation error give by the dependency `node-icu-charset-detector`
