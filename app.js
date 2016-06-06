@@ -231,8 +231,15 @@ var transformInput = function(callback) {
   var hostname = configuration.get('hostname');
   var port = configuration.get('port');
   var location = configuration.get('path');
+  var graphName;
 
-  var graphName = 'http://' + configuration.get('externaladdress') || ('http://' + hostname + ':' + port + location);
+  if(configuration.get('externaladdress') != null && configuration.get('externaladdress').length > 0)
+    graphName = 'http://' + configuration.get('externaladdress')
+  else
+    graphName = ('http://' + hostname + ':' + port + location);
+
+  console.log(graphName);
+
 
   var create = fs.readFileSync(path.resolve(__dirname, 'rdf', 'createGraph.q')).toString();
   create = create.split('[hostname]').join(graphName);
@@ -252,10 +259,10 @@ var transformInput = function(callback) {
   request.post(options, function(error) {
     if (error) return callback(error);
 
-    var pattern = configuration.get('rdf_stream_item_pattern');
-    var query = fs.readFileSync('./rdf/insertQuery.q').toString();
+    //var pattern = configuration.get('rdf_stream_item_pattern');
+    var query = fs.readFileSync('./rdf/sGraphFillingQuery.q').toString();
     query = query.split('[graphname]').join(graphName);
-    query = query.split('[pattern]').join(pattern);
+    //query = query.split('[pattern]').join(pattern);
 
     console.log(query);
     options.form.update = query;
@@ -286,13 +293,14 @@ var createNewGraphs = function(callback) {
 
   var createNewTriples = function(triple, cb) {
     console.log(triple);
-    var insertQuery = fs.readFileSync('./rdf/insertNewTriple.q').toString();
 
     var graph = triple.graph.value;
     var key = triple.key.value;
 
-    var pattern = configuration.get('rdf_stream_item_content_pattern');
-    insertQuery = insertQuery.split('[pattern]').join(pattern);
+    //var pattern = configuration.get('rdf_stream_item_content_pattern');
+    //insertQuery = insertQuery.split('[pattern]').join(pattern);
+
+    var insertQuery = fs.readFileSync('./rdf/timestampedGraphFillingQuery.q').toString();
     insertQuery = insertQuery.split('?key').join('<' + key + '>');
     insertQuery = insertQuery.split('[g]').join(graph);
 

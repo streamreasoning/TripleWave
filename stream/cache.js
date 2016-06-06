@@ -100,7 +100,12 @@ Cache.prototype.getAll = function() {
     }
   };
 
-  cache['sld:streamLocation'] = configuration.get('ws_address');
+  if(configuration.get('ws_address') != null && configuration.get('ws_address').length > 0 ){
+    cache['sld:streamLocation'] = configuration.get('ws_address');
+  } else {
+    cache['sld:streamLocation'] = 'ws://' + configuration.get('ws_hostname') + ':' + configuration.get('ws_port') + configuration.get('ws_stream_location');
+  }
+  
   cache['sld:tBoxLocation'] = {
     "@id": configuration.get('tbox_stream_location')
   };
