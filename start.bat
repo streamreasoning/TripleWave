@@ -1,6 +1,6 @@
 @echo off
 
-for /F "eol=# delims== tokens=1,*" %%a in (config/config.properties) do (
+for /F "eol=# delims== tokens=1,*" %%a in (config\config.properties) do (
 
     rem proper lines have both a and b set
     rem if okay, assign property to some kind of namespace
