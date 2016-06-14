@@ -13,7 +13,7 @@ for /F "eol=# delims== tokens=1,*" %%a in (config\config.properties) do (
 )
 
 rem do something useful with your vars
-if NOT use=="transform"(
+if NOT %use%=="transform"(
    java -jar jena-fuseki-server-2.3.1.jar --update --mem \ds &
    timeout 5
 )
