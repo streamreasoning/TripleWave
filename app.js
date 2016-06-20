@@ -252,7 +252,7 @@ var transformInput = function(callback) {
   request.post(options, function(error) {
     if (error) return callback(error);
 
-    var pattern = configuration.get('rdf_stream_item_pattern');
+    var pattern = configuration.get('rdf_stream_item_pattern').split('"').join('');
     var query = fs.readFileSync('./rdf/insertQuery.q').toString();
     query = query.split('[graphname]').join(graphName);
     query = query.split('[pattern]').join(pattern);
