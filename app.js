@@ -1,7 +1,9 @@
-//fixed
 var Primus = require('primus');
 var stream = require('stream');
+var path = require('path');
 
+var Cache = require('./stream/cache');
+var Enricher = require('./stream/enricher');
 var configuration = require('./configuration');
 
 //the WebSocket server
@@ -45,7 +47,7 @@ if (configuration.get('mode') === 'replay' || configuration.get('mode') === 'end
         write: (a, b, cb) => cb()
     }));
 } else if (configuration.get('mode') === 'transform') {
-    var Webstream = require(path.resolve('stream', 'input_stream', configuration.get('stream_name')));
+    var Webstream = require(path.resolve(configuration.get('transform_folder'), configuration.get('transform_transformer')));
 
     var cache = new Cache({});
     var enricher = new Enricher(primus);

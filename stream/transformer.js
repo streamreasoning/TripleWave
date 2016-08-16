@@ -14,7 +14,7 @@ function TransformerStream(options) {
     return new TransformerStream(options);
   }
 
-  this.transformer = new R2rml(path.resolve(__dirname, '../', 'transformation', configuration.get('stream.mapping')));
+  this.transformer = new R2rml(path.resolve(__dirname, '../', configuration.get('transform_folder'), configuration.get('stream_mapping')));
   // init Transform
   Transform.call(this, options);
 }

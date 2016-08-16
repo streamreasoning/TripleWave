@@ -6,7 +6,7 @@ var stream = require('stream');
 const debug = require('debug')('SparqlDataGen')
 
 var configuration = require('../../configuration')
-var query = fs.readFileSync(path.resolve(__dirname, '../../', 'rdf', 'getGraphContent.q')).toString();
+var query = fs.readFileSync(path.resolve(__dirname, '../../', configuration.get('rdf_query_folder'), 'getGraphContent.q')).toString();
 
 class SparqlDataGen extends stream.Readable {
     constructor(options) {
@@ -19,7 +19,7 @@ class SparqlDataGen extends stream.Readable {
     }
 
     retrieveIndices() {
-        let indQuery = fs.readFileSync(path.resolve(__dirname, '../../', 'rdf', 'selectGraphsWithTs.q')).toString();
+        let indQuery = fs.readFileSync(path.resolve(__dirname, '../../', configuration.get('rdf_query_folder'), 'selectGraphsWithTs.q')).toString();
         this.client
             .query(indQuery)
             .execute((err, data) => {
