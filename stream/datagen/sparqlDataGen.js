@@ -16,7 +16,6 @@ class SparqlDataGen extends stream.Readable {
         this.endpoint = configuration.get('rdf_query_endpoint');
         this.client = new SparqlClient(this.endpoint);
         this.bindings = null;
-
     }
 
     retrieveIndices() {

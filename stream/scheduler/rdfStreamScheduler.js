@@ -34,18 +34,13 @@ class RdfStreamScheduler extends stream.Transform {
           this.err = this.err + (deltaRealDate - deltaDataDate);
           this.iteration = this.iteration+1;
           debug('this.err: ', this.err, '(avg over ', this.iteration, ' elements: ', this.err/this.iteration, ')')
-          debug("I am forwarding \n\t", data);
+//          debug("I am forwarding \n\t", data);
           this.push(data)
           this.previousRealDate = currentRealDate;
           this.previousDataDate = currentDataDate;
           return cb();
         },sleepTime);
     }
-//    const error = null;
-//    return cb(error);
-
-//    const error = null; // Fill in case of error
-//    return cb( error );
   }
 }
 

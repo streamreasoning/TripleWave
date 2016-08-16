@@ -22,12 +22,27 @@ if (configuration.get('mode') === 'replay' || configuration.get('mode') === 'end
         var Scheduler = require('./stream/scheduler/rdfStreamScheduler');
     }
 
-    var datagen = new DataGen({objectMode: true,  highWaterMark: 1 });
-    var scheduler = new Scheduler({objectMode: true,  highWaterMark: 1 });
+    var datagen = new DataGen({
+        objectMode: true,
+        highWaterMark: 1
+    });
+    var scheduler = new Scheduler({
+        objectMode: true,
+        highWaterMark: 1
+    });
 
-    toUse = datagen.pipe(scheduler).pipe(new stream.Writable({
-      objectMode: true,
-      write: (a, b, cb) => cb()
+    //compose the stream
+    toUse = datagen.pipe(scheduler);
+    if (configuration.get("mode")=='endless') {
+      var Replacer = require('./stream/currentTimestampReplacer');
+        toUse = toUse.pipe(new Replacer({
+            objectMode: true,
+            highWaterMark: 1
+        }));
+    }
+    toUse = toUse.pipe(new stream.Writable({
+        objectMode: true,
+        write: (a, b, cb) => cb()
     }));
 } else if (configuration.get('mode') === 'transform') {
     var Webstream = require(path.resolve('stream', 'input_stream', configuration.get('stream_name')));
@@ -39,11 +54,15 @@ if (configuration.get('mode') === 'replay' || configuration.get('mode') === 'end
     toUse = activeStream.pipe(enricher);
 }
 
-if(toUse == null){
+if (toUse == null) {
     var DataGen = require('./stream/datagen/dummyDataGen');
     var Scheduler = require('./stream/scheduler/dummyScheduler');
-    var datagen = new DataGen({objectMode: true});
-    var scheduler = new Scheduler({objectMode: true});
+    var datagen = new DataGen({
+        objectMode: true
+    });
+    var scheduler = new Scheduler({
+        objectMode: true
+    });
     toUse = datagen.pipe(scheduler);
 }
 
