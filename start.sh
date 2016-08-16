@@ -4,13 +4,15 @@
 . config/config.properties
 
 if [ "$mode" != "transform" ]; then
-   cd fuseki
-#   if [ "$file" = "" ]; then
-      java -jar jena-fuseki-server-2.3.1.jar --update --mem /ds &
-#   else
-#      java -jar jena-fuseki-server-2.3.1.jar --mem --update /ds &
-   cd ..
-   sleep 10
+	if [ "$sources" != "rdfstream" ]; then
+	   cd fuseki
+	#   if [ "$file" = "" ]; then
+	      java -jar jena-fuseki-server-2.3.1.jar --update --mem /ds &
+	#   else
+	#      java -jar jena-fuseki-server-2.3.1.jar --mem --update /ds &
+	   cd ..
+	   sleep 10
+	fi
 else
    echo "don't start fuseki"
 fi
