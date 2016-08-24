@@ -16,7 +16,7 @@ class RdfStreamDataGen extends stream.PassThrough {
         file.pipe(JSONStream.parse('*'))
           .pipe(this)
           .on('data', (data) => {
-            //console.log(data);
+            debug(data);
             debug("-----------");
           })
 /*          .pipe((graph) => {
