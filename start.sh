@@ -19,4 +19,10 @@ fi
 
 
 echo "the fuseki pid is $!"
-node app.js -fuseki=$!
+
+if [ "$1" == 'debug' ]; then 
+	echo "Starting TripleWave in debug mode"
+	node debug app.js
+else
+	DEBUG=* node app.js -fuseki=$!
+fi

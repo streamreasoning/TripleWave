@@ -8,7 +8,7 @@ path=/TripleWave-transform
 # external address (use in case of proxy)
 externaladdress=131.175.141.249/TripleWave-transform
 
-mode=replay
+mode=transform
 
 # name of the js file that needs to be loaded to retrieve the web stream
 stream_name=wikiStream.js

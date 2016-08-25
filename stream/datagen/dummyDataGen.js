@@ -1,4 +1,6 @@
-var stream = require('stream')
+const stream = require('stream');
+const debug = require('debug')('DummyDataGen');
+
 
 class DummyDataGen extends stream.Readable {
   constructor( options ) {
@@ -6,7 +8,7 @@ class DummyDataGen extends stream.Readable {
     let i=0;
     setInterval(()=>{
       i++;
-      console.log("At the ", i, " iteration, the time is ", Date.now());
+      debug("At the ", i, " iteration, the time is ", Date.now());
       this.push({iteration: i, time: Date.now()});
     }, 1000);
   }

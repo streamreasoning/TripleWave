@@ -40,41 +40,16 @@ Cache.prototype.add = function(element) {
   this.array.unshift(element);
 };
 
-Cache.prototype.find = function(ts) {
+Cache.prototype.find = function(id) {
 
-  var id = 'http://' + configuration.get('hostname');
-
-  if (configuration.get('port')) {
-    id += ':' + configuration.get('port');
-  }
-
-  id += configuration.get('path') + '/';
-
-  id += ts;
-  console.log(id);
   for (var i = this.array.length - 1; i >= 0; i--) {
     var e = this.array[i];
 
     console.log(e['@id']);
     console.log(id);
 
-    if (e['@id'] === id) {
-      return e;
-    }
-  }
-
-  id = 'http://' + configuration.get('hostname');
-
-  id += configuration.get('path') + '/';
-
-  id += ts;
-  for (var i = this.array.length - 1; i >= 0; i--) {
-    var e = this.array[i];
-
-    console.log(e['@id']);
-    console.log(id);
-
-    if (e['@id'] === id) {
+    let splittedId = e['@id'].split('/'); 
+    if (splittedId[splittedId.length-1] === id) {
       return e;
     }
   }
