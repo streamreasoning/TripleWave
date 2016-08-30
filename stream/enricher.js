@@ -41,7 +41,7 @@ util.inherits(EnrichStream, Transform);
 
 EnrichStream.prototype._transform = function(chunk, enc, cb) {
 
-  var change = JSON.parse(chunk.toString());
+  var change = chunk;
   change = this.enrich(change);
 
   var graph = {};
@@ -62,7 +62,7 @@ EnrichStream.prototype._transform = function(chunk, enc, cb) {
   element["@id"] = id;
   element["@graph"] = graph;
 
-  this.push(JSON.stringify(element));
+  this.push(element);
   cb();
 
 };

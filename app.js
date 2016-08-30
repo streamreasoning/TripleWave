@@ -4,6 +4,7 @@ const path = require('path');
 const debug = require('debug')('TripleWave')
 const express = require('express');
 const async = require('async');
+const JSONStream = require('JSONStream')
 
 const Cache = require('./stream/cache');
 const Enricher = require('./stream/enricher');
@@ -16,10 +17,10 @@ debug('Starting up TripleWave in %s mode', configuration.get('mode'));
 
 // TODO: rifarlo con le promise
 let cache = null;
+let toUse = null;
 
 let createStreams = function (callback) {
     
-    let toUse = null;
     cache = new Cache(
         {
             objectMode: true,
@@ -82,10 +83,17 @@ let createStreams = function (callback) {
         }));*/
 
     } else if (configuration.get('mode') === 'transform') {
-        var Webstream = require(path.resolve(configuration.get('transform_folder'), configuration.get('transform_transformer')));
+        let stream = path.resolve(configuration.get('transform_folder'), configuration.get('transform_transformer'));
+        debug('loadgin stream %s',stream);
+        var Webstream = require(stream);
 
-        var enricher = new Enricher(primus);
-        var activeStream = new Webstream();
+
+        var enricher = new Enricher({
+            objectMode:true
+        });
+        var activeStream = new Webstream({
+            objectMode:true
+        });
         enricher.pipe(cache);
         toUse = activeStream.pipe(enricher);
 
@@ -116,6 +124,18 @@ let startUp = function (callback) {
 
     // starting up the http and websocket servers 
     let app = express();
+
+    app.get('/stream',(req,res)=>{
+
+        toUse
+        .pipe(JSONStream.stringify())
+        .pipe(res);
+
+        res.on('close',()=>{
+            debug('Closing the HTTP chunk stream');
+            toUse.unpipe(res);
+        })
+    });
 
     app.get('/sgraph', function (req, res) {
         return res.json(cache.getAll());

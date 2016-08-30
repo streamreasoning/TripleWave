@@ -1,53 +1,58 @@
 {
-    "name": "TripleWave",
-    "version": "1.1.0",
-    "description": "",
-    "main": "app.js",
-    "dependencies": {
-        "JSONStream": "^1.1.4",
-        "async": "^2.0.0-rc.3",
-        "body-parser": "^1.13.1",
-        "debug": "^2.2.0",
-        "errorhandler": "^1.4.0",
-        "express": "^4.13.0",
-        "io": "^0.1.10",
-        "jsonld": "^0.4.8",
-        "minimist": "^1.2.0",
-        "moment": "^2.14.1",
-        "n3": "^0.4.5",
-        "oboe": "^2.1.2",
-        "primus": "^6.0.1",
-        "properties-reader": "0.0.15",
-        "ps-node": "0.0.5",
-        "rdflib": "^0.6.1",
-        "request": "^2.72.0",
-        "socket.io": "^1.4.5",
-        "socket.io-client": "^1.4.5",
-        "sparql-client-2": "github:eddieantonio/node-sparql-client",
-        "turtle-to-jsonld": "github:janez87/turtle-to-jsonld",
-        "underscore": "^1.8.3",
-        "underscore.string": "^3.3.4",
-        "when": "^3.7.7",
-        "wikichanges": "github:janez87/wikichanges",
-        "ws": "^1.1.0"
+  "name": "TripleWave",
+  "version": "1.1.0",
+  "description": "",
+  "main": "app.js",
+  "dependencies": {
+    "JSONStream": "^1.1.4",
+    "active-x-obfuscator": "0.0.2",
+    "async": "^2.0.0-rc.3",
+    "body-parser": "^1.13.1",
+    "debug": "^2.2.0",
+    "errorhandler": "^1.4.0",
+    "express": "^4.13.0",
+    "io": "^0.1.10",
+    "jsonld": "^0.4.8",
+    "minimist": "^1.2.0",
+    "moment": "^2.14.1",
+    "n3": "^0.4.5",
+    "oboe": "^2.1.2",
+    "primus": "^6.0.1",
+    "properties-reader": "0.0.15",
+    "ps-node": "0.0.5",
+    "rdflib": "^0.6.1",
+    "request": "^2.72.0",
+    "socket.io-client": "^0.9.1",
+    "sparql-client-2": "github:eddieantonio/node-sparql-client",
+    "turtle-to-jsonld": "github:janez87/turtle-to-jsonld",
+    "underscore": "^1.8.3",
+    "underscore.string": "^3.3.4",
+    "when": "^3.7.7",
+    "wikichanges": "github:janez87/wikichanges",
+    "ws": "^1.1.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "wscat": "wscat"
+  },
+  "author": "The fellowship of TripleWave",
+  "contributors": [
+    {
+      "name": "Andrea Mauri",
+      "email": ""
     },
-    "devDependencies": {},
-    "scripts": {
-        "wscat": "wscat"
+    {
+      "name": "Jean-Paul Calbimonte",
+      "email": ""
     },
-    "author": "The fellowship of TripleWave",
-    "contributors": [{
-        "name": "Andrea Mauri",
-        "email": ""
-    }, {
-        "name": "Jean-Paul Calbimonte",
-        "email": ""
-    }, {
-        "name": "Daniele Dell'Aglio",
-        "email": "daniele.dellaglio@polimi.it"
-    }, {
-        "name": "Marco Balduini",
-        "email": ""
-    }],
-    "license": "Apache-2.0"
+    {
+      "name": "Daniele Dell'Aglio",
+      "email": "daniele.dellaglio@polimi.it"
+    },
+    {
+      "name": "Marco Balduini",
+      "email": ""
+    }
+  ],
+  "license": "Apache-2.0"
 }

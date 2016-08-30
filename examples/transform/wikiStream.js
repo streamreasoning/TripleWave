@@ -1,6 +1,7 @@
 var stream = require('stream');
 var util = require('util');
 var wikichanges = require("wikichanges");
+var debug = require('debug')('Wikistream IRC');
 
 var Transform = stream.Transform || require('readable-stream').Transform;
 
@@ -10,7 +11,8 @@ function WikiStream(options) {
     return new WikiStream(options);
   }
 
-  console.log('Creating the stream');
+  debug('Creating the stream');
+
   this.close = false;
   this.w = new wikichanges.WikiChanges({
     ircNickname: "jsonLDBot",
@@ -19,6 +21,7 @@ function WikiStream(options) {
   _this = this;
 
   this.w.listen(function(c) {
+    debug(c);
     if (!_this.close) {
       _this.push(JSON.stringify(c));
     } else {

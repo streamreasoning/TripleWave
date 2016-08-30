@@ -5,6 +5,7 @@ var R2rml = require('../r2rml-js/r2rml.js');
 var path = require('path');
 var PropertiesReader = require('properties-reader');
 var configuration = PropertiesReader(path.resolve(__dirname, '../', 'config', 'config.properties'));
+var debug = require('debug')('TransformerStream');
 
 var Transform = stream.Transform || require('readable-stream').Transform;
 
@@ -30,10 +31,11 @@ TransformerStream.prototype.enrich = function(triple) {
 
 TransformerStream.prototype._transform = function(chunk, enc, cb) {
 
-  var data = JSON.parse(chunk.toString());
+  
+  var data = chunk;
   data = this.enrich(data);
 
-  this.push(JSON.stringify(data));
+  this.push(data);
   cb();
 };
 

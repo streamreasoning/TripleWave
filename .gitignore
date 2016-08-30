@@ -34,3 +34,6 @@ testRdf.js
 
 #Examples
 Running_Examples/
+
+#Mac stuff
+.DS_Store

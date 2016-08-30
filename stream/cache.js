@@ -29,7 +29,6 @@ Cache.prototype._write = function(data, enc, callback) {
     ts: new Date(data['http://www.w3.org/ns/prov#generatedAtTime']).getTime()
   }, _.pick(data, ['http://www.w3.org/ns/prov#generatedAtTime', '@id', '@graph'])));
 
-  debug(data)
   callback();
 };
 

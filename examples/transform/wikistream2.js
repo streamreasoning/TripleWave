@@ -2,7 +2,7 @@ const stream = require('stream');
 const util = require('util');
 const wikichanges = require("wikichanges");
 const io = require('socket.io-client')
-const debug = require('debug')('Wikistream2');
+const debug = require('debug')('Wikistream');
 
 const Transform = stream.Transform || require('readable-stream').Transform;
 
@@ -30,7 +30,7 @@ function WikiStream(options) {
     debug(error);
   });
   socket.on('change', function(data) {
-    console.log(data);
+    debug(data);
     _this.push(data)
   });
   // init Transform
