@@ -21,7 +21,7 @@ function WikiStream(options) {
   _this = this;
 
   this.w.listen(function(c) {
-    debug(c);
+    console.log(c);
     if (!_this.close) {
       _this.push(c);
     } else {
