@@ -23,7 +23,7 @@ function WikiStream(options) {
   this.w.listen(function(c) {
     debug(c);
     if (!_this.close) {
-      _this.push(JSON.stringify(c));
+      _this.push(c);
     } else {
       _this.push(null);
     }
