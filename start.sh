@@ -1,7 +1,35 @@
 #!/bin/sh
 #. triplewave.properties
  
-. config/config.properties
+ while [[ "$#" > 1 ]]; do case $1 in
+    --configuration) configuration="$2";;
+    *) break;;
+  esac; shift; shift
+done
+
+if [ -z "$configuration" ]; then
+	configuration="config/config.properties"
+fi
+
+source "$configuration"
+
+ while [[ "$#" > 1 ]]; do case $1 in
+    --mode) export mode="$2";;
+	--sources) export sources="$2";;
+    *) break;;
+  esac; shift; shift
+done
+
+#. config/config.properties
+
+
+#if [ -z "$mode" ]; then
+#	echo "No running mode specified"
+#	exit
+#fi
+
+echo "$mode"
+echo "$sources"
 
 if [ "$mode" != "transform" ]; then
 	if [ "$sources" != "rdfstream" ]; then
@@ -20,9 +48,5 @@ fi
 
 echo "the fuseki pid is $!"
 
-if [ "$1" == 'debug' ]; then 
-	echo "Starting TripleWave in debug mode"
-	node debug app.js
-else
-	DEBUG=* node app.js -fuseki=$!
-fi
+DEBUG=* node app.js --fuseki=$! --mode="$mode" --configuration="$configuration" --sources="$sources"
+

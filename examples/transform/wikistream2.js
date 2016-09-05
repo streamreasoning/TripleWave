@@ -6,6 +6,8 @@ const debug = require('debug')('Wikistream');
 
 const Transform = stream.Transform || require('readable-stream').Transform;
 
+// Stream wikipedia changing using socket.io
+// PROBLEM: wikipedia uses an old version of socket.io
 function WikiStream(options) {
   // allow use without new
   if (!(this instanceof WikiStream)) {

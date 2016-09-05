@@ -7,10 +7,10 @@ var path = require('path');
 var Transform = stream.Transform || require('readable-stream').Transform;
 var N3 = require('n3');
 var jsonld = require('jsonld');
-var configuration = require('../configuration')
 
 function EnrichStream(options) {
 
+  var configuration = options.configuration;
   this.mapping = new R2rml(path.resolve(__dirname, '../', configuration.get('transform_folder'), configuration.get('transform_mapping')));
 
   this.enrich = function(data) {

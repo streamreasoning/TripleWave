@@ -6,36 +6,37 @@ var stream = require('stream');
 const async = require('async');
 const debug = require('debug')('SparqlDataGen')
 
-var configuration = require('../../configuration')
-var query = fs.readFileSync(path.resolve(__dirname, '../../', configuration.get('rdf_query_folder'), 'getGraphContent.q')).toString();
+//var query = fs.readFileSync(path.resolve(__dirname, '../../', configuration.get('rdf_query_folder'), 'getGraphContent.q')).toString();
 
 class SparqlDataGen extends stream.Readable {
     constructor(options) {
         super(options);
 
+        this.configuration = options.configuration;
         this.firstIteration = true;
-        this.endpoint = configuration.get('rdf_query_endpoint');
+        this.endpoint = options.configuration.get('rdf_query_endpoint');
         this.client = new SparqlClient(this.endpoint);
         this.bindings = null;
     }
 
     loadData(callback) {
-
+        
+        let _this = this;
         var loadFile = function (callback) {
 
-            debug('Loading the dataset file ' + configuration.get('rdf_file'));
+            debug('Loading the dataset file ' + _this.configuration.get('rdf_file'));
 
             //'LOAD <file:../rdf/data.ttl> INTO GRAPH <http://example/input>'
-            //var query = 'LOAD <file:..' + configuration.get('rdf_file') + '> INTO GRAPH <http://example/input>';
+            //var query = 'LOAD <file:..' + _this.configuration.get('rdf_file') + '> INTO GRAPH <http://example/input>';
 
             var query = fs.readFileSync(path.resolve(__dirname,'../../', 'rdf', 'loadFile.q')).toString();
 
-            query = query.split('[file]').join(configuration.get('rdf_file'));
+            query = query.split('[file]').join(_this.configuration.get('rdf_file'));
 
             debug(query);
 
             var options = {
-                url: configuration.get('rdf_update_endpoint'),
+                url: _this.configuration.get('rdf_update_endpoint'),
                 method: 'POST',
                 form: {
                     update: query
@@ -51,23 +52,23 @@ class SparqlDataGen extends stream.Readable {
 
         var transformInput = function (callback) {
 
-            if (configuration.get('rdf_source') === 'rdfstream') {
+            if (_this.configuration.get('rdf_source') === 'rdfstream') {
                 console.log('No need to transform the file');
                 return callback();
             }
 
-            var hostname = configuration.get('hostname');
-            var port = configuration.get('port');
-            var location = configuration.get('path')||'';
+            var hostname = _this.configuration.get('hostname');
+            var port = _this.configuration.get('port');
+            var location = _this.configuration.get('path')||'';
 
-            var graphName = 'http://' + (configuration.get('externaladdress') || (hostname + ':' + port + location));
+            var graphName = 'http://' + (_this.configuration.get('externaladdress') || (hostname + ':' + port + location));
 
             var create = fs.readFileSync(path.resolve(__dirname,'../../', 'rdf', 'createGraph.q')).toString();
             create = create.split('[hostname]').join(graphName);
 
             debug(create);
             var options = {
-                url: configuration.get('rdf_update_endpoint'),
+                url: _this.configuration.get('rdf_update_endpoint'),
                 method: 'POST',
                 form: {
                     update: create
@@ -80,7 +81,7 @@ class SparqlDataGen extends stream.Readable {
             request.post(options, function (error) {
                 if (error) return callback(error);
 
-                var pattern = configuration.get('rdf_stream_item_pattern');
+                var pattern = _this.configuration.get('rdf_stream_item_pattern');
                 //var query = fs.readFileSync('./rdf/insertQuery.q').toString();
                 var query = fs.readFileSync(path.resolve(__dirname,'../../','rdf','insertQuery.q')).toString();
                 query = query.split('[graphname]').join(graphName);
@@ -93,25 +94,24 @@ class SparqlDataGen extends stream.Readable {
             });
         };
 
-        let _this = this;
         var createNewGraphs = function (callback) {
 
-            if (configuration.get('rdf_source') === 'rdfstream') {
+            if (_this.configuration.get('rdf_source') === 'rdfstream') {
                 console.log('No need to transform the file');
                 return callback();
             }
-            var hostname = configuration.get('hostname');
-            var port = configuration.get('port');
-            var location = configuration.get('path');
+            var hostname = _this.configuration.get('hostname');
+            var port = _this.configuration.get('port');
+            var location = _this.configuration.get('path');
 
-            var graphName = configuration.get('externaladdress') || ('http://' + hostname + ':' + port + location);
+            var graphName = _this.configuration.get('externaladdress') || ('http://' + hostname + ':' + port + location);
 
             var query = fs.readFileSync(path.resolve(__dirname,'../../', 'rdf', 'selectGraphs.q')).toString();
             query = query.split('[hostname]').join(graphName);
 
             console.log('creating the new graph');
             console.log(query);
-            var client = new SparqlClient(configuration.get('rdf_query_endpoint'));
+            var client = new SparqlClient(_this.configuration.get('rdf_query_endpoint'));
 
             var createNewTriples = function (triple, cb) {
                 console.log(triple);
@@ -121,7 +121,7 @@ class SparqlDataGen extends stream.Readable {
                 var graph = triple.graph.value;
                 var key = triple.key.value;
 
-                var pattern = configuration.get('rdf_stream_item_content_pattern');
+                var pattern = _this.configuration.get('rdf_stream_item_content_pattern');
                 insertQuery = insertQuery.split('[pattern]').join(pattern);
                 insertQuery = insertQuery.split('?key').join('<' + key + '>');
                 insertQuery = insertQuery.split('[g]').join(graph);
@@ -130,7 +130,7 @@ class SparqlDataGen extends stream.Readable {
                 console.log(create);
                 console.log(insertQuery);
                 var options = {
-                    url: configuration.get('rdf_update_endpoint'),
+                    url: _this.configuration.get('rdf_update_endpoint'),
                     method: 'POST',
                     form: {
                         update: create
@@ -175,7 +175,7 @@ class SparqlDataGen extends stream.Readable {
 
 
     retrieveIndices() {
-        let indQuery = fs.readFileSync(path.resolve(__dirname, '../../', configuration.get('rdf_query_folder'), 'selectGraphsWithTs.q')).toString();
+        let indQuery = fs.readFileSync(path.resolve(__dirname, '../../', this.configuration.get('rdf_query_folder'), 'selectGraphsWithTs.q')).toString();
         debug(indQuery);
         this.client
             .query(indQuery)
@@ -207,6 +207,9 @@ class SparqlDataGen extends stream.Readable {
     }
 
     sendNext() {
+        
+        var query = fs.readFileSync(path.resolve(__dirname, '../../', this.configuration.get('rdf_query_folder'), 'getGraphContent.q')).toString();
+
         var b = this.bindings.pop();
         if (!b)
             return this.push(null);
@@ -217,7 +220,7 @@ class SparqlDataGen extends stream.Readable {
         query = query.split('[graph]').join(graph);
 
         var options = {
-            url: configuration.get('rdf_query_endpoint'),
+            url: this.configuration.get('rdf_query_endpoint'),
             method: 'POST',
             form: {
                 query: query

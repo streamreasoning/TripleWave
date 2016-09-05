@@ -6,7 +6,6 @@ var PropertiesReader = require('properties-reader');
 var path = require('path');
 var debug = require('debug')('Cache');
 
-var configuration = PropertiesReader(path.resolve(__dirname, '../', 'config', 'config.properties'));
 
 function Cache(options) {
 
@@ -14,6 +13,7 @@ function Cache(options) {
     return new Cache(options);
   }
 
+  this.configuration = options.configuration;
   this.array = [];
   this.limit = options.limit || 100;
 
@@ -74,9 +74,9 @@ Cache.prototype.getAll = function() {
     }
   };
 
-  cache['sld:streamLocation'] = configuration.get('ws_address');
+  cache['sld:streamLocation'] = this.configuration.get('ws_address');
   cache['sld:tBoxLocation'] = {
-    "@id": configuration.get('tbox_stream_location')
+    "@id": this.configuration.get('tbox_stream_location')
   };
 
   for (var i = array.length - 1; i >= 0; i--) {

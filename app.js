@@ -5,26 +5,44 @@ const debug = require('debug')('TripleWave')
 const express = require('express');
 const async = require('async');
 const JSONStream = require('JSONStream')
+const program = require('commander');
 
 const Cache = require('./stream/cache');
 const Enricher = require('./stream/enricher');
-const configuration = require('./configuration');
-
-
-
-debug('Starting up TripleWave in %s mode', configuration.get('mode'));
-
+var configuration; 
 
 // TODO: rifarlo con le promise
 let cache = null;
 let toUse = null;
 
+let parseCommandLine = function(callback){
+    program
+    .option('-m, --mode [mode]','TripleWave running mode',/^(transform|endless|replay)$/i)
+    .option('-c, --configuration [configuration]', 'Path to the configuration file')
+    .option('-s, --sources [sources]', 'Source of the data')
+    .option('--fuseki [fuseki]', 'Fuseki PID')
+    .parse(process.argv);
+
+    //debug('Mode %s',program.mode)
+    //debug('Configuration %s',program.configuration)
+    //debug('Source %s',program.source)
+
+    configuration = require('./configuration')(program.configuration);
+    program.mode ? configuration.set('mode',program.mode) : null;
+    program.sources ? configuration.set('sources',program.sources) : null;
+
+    debug(configuration.get('mode'));
+    debug(configuration.get('sources'));
+    return callback();
+}
+
 let createStreams = function (callback) {
-    
+
     cache = new Cache(
         {
             objectMode: true,
-            limit: 100
+            limit: 100,
+            configuration:configuration
         }
     );
 
@@ -32,6 +50,17 @@ let createStreams = function (callback) {
         if (configuration.get('sources') == 'rdfstream') {
             var DataGen = require('./stream/datagen/rdfStreamDataGen');
             var Scheduler = require('./stream/scheduler/rdfStreamScheduler');
+
+            var datagen = new DataGen({
+                objectMode: true,
+                highWaterMark: 1,
+                configuration:configuration
+            });
+            var scheduler = new Scheduler({
+                objectMode: true,
+                highWaterMark: 1,
+                configuration:configuration
+            });
 
             //compose the stream
             toUse = datagen.pipe(scheduler);
@@ -55,11 +84,13 @@ let createStreams = function (callback) {
 
             var datagen = new DataGen({
                 objectMode: true,
-                highWaterMark: 1
+                highWaterMark: 1,
+                configuration:configuration
             });
             var scheduler = new Scheduler({
                 objectMode: true,
-                highWaterMark: 1
+                highWaterMark: 1,
+                configuration:configuration
             });
 
             return datagen.loadData(() => {
@@ -84,15 +115,17 @@ let createStreams = function (callback) {
 
     } else if (configuration.get('mode') === 'transform') {
         let stream = path.resolve(configuration.get('transform_folder'), configuration.get('transform_transformer'));
-        debug('loadgin stream %s',stream);
+        debug('loadgin stream %s', stream);
         var Webstream = require(stream);
 
 
         var enricher = new Enricher({
-            objectMode:true
+            objectMode: true,
+            configuration:configuration
         });
         var activeStream = new Webstream({
-            objectMode:true
+            objectMode: true,
+            configuration:configuration
         });
         enricher.pipe(cache);
         toUse = activeStream.pipe(enricher);
@@ -105,10 +138,12 @@ let createStreams = function (callback) {
         var DataGen = require('./stream/datagen/dummyDataGen');
         var Scheduler = require('./stream/scheduler/dummyScheduler');
         var datagen = new DataGen({
-            objectMode: true
+            objectMode: true,
+            configuration:configuration
         });
         var scheduler = new Scheduler({
-            objectMode: true
+            objectMode: true,
+            configuration: configuration
         });
         toUse = datagen.pipe(scheduler);
         toUse.pipe(cache);
@@ -125,13 +160,13 @@ let startUp = function (callback) {
     // starting up the http and websocket servers 
     let app = express();
 
-    app.get('/stream',(req,res)=>{
+    app.get('/stream', (req, res) => {
 
         toUse
-        .pipe(JSONStream.stringify())
-        .pipe(res);
+            .pipe(JSONStream.stringify())
+            .pipe(res);
 
-        res.on('close',()=>{
+        res.on('close', () => {
             debug('Closing the HTTP chunk stream');
             toUse.unpipe(res);
         })
@@ -186,6 +221,6 @@ let startUp = function (callback) {
 
 };
 
-async.series([createStreams, startUp], () => {
+async.series([parseCommandLine, createStreams, startUp], () => {
     debug('TripleWave ready');
 });
