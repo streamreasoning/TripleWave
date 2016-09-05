@@ -4,9 +4,8 @@ var _ = require('underscore');
 var Transform = stream.Transform || require('readable-stream').Transform;
 var PropertiesReader = require('properties-reader');
 var path = require('path');
+var debug = require('debug')('Cache');
 
-
-var configuration = PropertiesReader(path.resolve(__dirname, '../', 'config', 'config.properties'));
 
 function Cache(options) {
 
@@ -14,6 +13,7 @@ function Cache(options) {
     return new Cache(options);
   }
 
+  this.configuration = options.configuration;
   this.array = [];
   this.limit = options.limit || 100;
 
@@ -23,13 +23,12 @@ function Cache(options) {
 }
 util.inherits(Cache, Transform);
 
-Cache.prototype._write = function(chunk, enc, callback) {
-  var data = JSON.parse(chunk);
+Cache.prototype._write = function(data, enc, callback) {
+  //var data = JSON.parse(chunk);
   this.add(_.extend({
     ts: new Date(data['http://www.w3.org/ns/prov#generatedAtTime']).getTime()
   }, _.pick(data, ['http://www.w3.org/ns/prov#generatedAtTime', '@id', '@graph'])));
 
-  console.log(data)
   callback();
 };
 
@@ -40,41 +39,16 @@ Cache.prototype.add = function(element) {
   this.array.unshift(element);
 };
 
-Cache.prototype.find = function(ts) {
+Cache.prototype.find = function(id) {
 
-  var id = 'http://' + configuration.get('hostname');
-
-  if (configuration.get('port')) {
-    id += ':' + configuration.get('port');
-  }
-
-  id += configuration.get('path') + '/';
-
-  id += ts;
-  console.log(id);
   for (var i = this.array.length - 1; i >= 0; i--) {
     var e = this.array[i];
 
     console.log(e['@id']);
     console.log(id);
 
-    if (e['@id'] === id) {
-      return e;
-    }
-  }
-
-  id = 'http://' + configuration.get('hostname');
-
-  id += configuration.get('path') + '/';
-
-  id += ts;
-  for (var i = this.array.length - 1; i >= 0; i--) {
-    var e = this.array[i];
-
-    console.log(e['@id']);
-    console.log(id);
-
-    if (e['@id'] === id) {
+    let splittedId = e['@id'].split('/'); 
+    if (splittedId[splittedId.length-1] === id) {
       return e;
     }
   }
@@ -100,9 +74,9 @@ Cache.prototype.getAll = function() {
     }
   };
 
-  cache['sld:streamLocation'] = configuration.get('ws_address');
+  cache['sld:streamLocation'] = this.configuration.get('ws_address');
   cache['sld:tBoxLocation'] = {
-    "@id": configuration.get('tbox_stream_location')
+    "@id": this.configuration.get('tbox_stream_location')
   };
 
   for (var i = array.length - 1; i >= 0; i--) {

@@ -1,0 +1,49 @@
+# triplewave port
+port=8114
+# host 
+hostname=131.175.141.249
+# root path
+path=/TripleWave-transform
+
+# external address (use in case of proxy)
+externaladdress=131.175.141.249/TripleWave-transform
+
+# triplewave mode
+# transform: transform a web stream in rdf
+# replay: streamify a rdf dataset retrieved from a sparql endpoint
+# endless: similar to the replay, it substitute the original timestamps with the current (need better explaination)
+mode=transform
+
+# if mode = transform
+# name of the js file that needs to be loaded to retrieve the web stream
+stream_name=wikiStream.js 
+# file of the r2rml transformation
+stream_mapping=wiki.r2rml
+
+# endpoint for the websocket
+ws_stream_location=/TripleWave-transform/stream
+ws_port=8124
+
+# where is possobile to connect to the wesbsocket (should match you apache / ngix configuration)
+ws_address=ws://131.175.141.249/TripleWave-transform/stream
+
+
+
+#if mode = replay | endless
+#fuseki endpoint
+rdf_query_endpoint=http://localhost:3030/ds/query
+rdf_update_endpoint=http://localhost:3030/ds/update
+#path to the file
+rdf_file=../rdf/data.ttl
+#stream item pattern
+rdf_stream_item_pattern=?key <http://knoesis.wright.edu/ssw/ont/sensor-observation.owl#samplingTime> ?time . ?time <http://www.w3.org/2006/time#inXSDDateTime> ?ts
+rdf_stream_item_content_pattern=?key ?p ?o
+# location of the tbox
+tbox_stream_location=http://purl.oclc.org/NET/ssnx/ssn
+
+# define the format of the input file
+# the supported fromat are triples, quads, rdfstream
+# triple: ...
+# quads: ...
+# rdfstream: ...
+sources=triples

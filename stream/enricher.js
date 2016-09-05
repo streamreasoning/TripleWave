@@ -7,11 +7,11 @@ var path = require('path');
 var Transform = stream.Transform || require('readable-stream').Transform;
 var N3 = require('n3');
 var jsonld = require('jsonld');
-var configuration = PropertiesReader(path.resolve(__dirname, '../', 'config', 'config.properties'));
 
 function EnrichStream(options) {
 
-  this.mapping = new R2rml(path.resolve(__dirname, '../', 'transformation', configuration.get('stream_mapping')));
+  var configuration = options.configuration;
+  this.mapping = new R2rml(path.resolve(__dirname, '../', configuration.get('transform_folder'), configuration.get('transform_mapping')));
 
   this.enrich = function(data) {
 
@@ -41,7 +41,7 @@ util.inherits(EnrichStream, Transform);
 
 EnrichStream.prototype._transform = function(chunk, enc, cb) {
 
-  var change = JSON.parse(chunk.toString());
+  var change = chunk;
   change = this.enrich(change);
 
   var graph = {};
@@ -62,7 +62,7 @@ EnrichStream.prototype._transform = function(chunk, enc, cb) {
   element["@id"] = id;
   element["@graph"] = graph;
 
-  this.push(JSON.stringify(element));
+  this.push(element);
   cb();
 
 };

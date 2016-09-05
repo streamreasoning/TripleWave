@@ -2,10 +2,12 @@ const stream = require('stream');
 const util = require('util');
 const wikichanges = require("wikichanges");
 const io = require('socket.io-client')
-const debug = require('debug')('Wikistream2');
+const debug = require('debug')('Wikistream');
 
 const Transform = stream.Transform || require('readable-stream').Transform;
 
+// Stream wikipedia changing using socket.io
+// PROBLEM: wikipedia uses an old version of socket.io
 function WikiStream(options) {
   // allow use without new
   if (!(this instanceof WikiStream)) {
@@ -30,7 +32,7 @@ function WikiStream(options) {
     debug(error);
   });
   socket.on('change', function(data) {
-    console.log(data);
+    debug(data);
     _this.push(data)
   });
   // init Transform
