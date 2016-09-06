@@ -4,4 +4,4 @@ permalink: ':title'
 pygments: true
 safe: false
 title: 'TripleWave'
-highlighter:'rouge'
+highlighter:rouge
