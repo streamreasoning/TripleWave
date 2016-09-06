@@ -1,7 +1,8 @@
 #!/bin/sh
 #. triplewave.properties
  
- while [[ "$#" > 1 ]]; do case $1 in
+
+while [[ "$#" > 1 ]]; do case $1 in
     --configuration) configuration="$2";;
     *) break;;
   esac; shift; shift
@@ -11,42 +12,54 @@ if [ -z "$configuration" ]; then
 	configuration="config/config.properties"
 fi
 
-source "$configuration"
+echo "Looking for the configuration file ${configuration}"
 
- while [[ "$#" > 1 ]]; do case $1 in
-    --mode) export mode="$2";;
+echo "Reading the configuration file"
+while IFS='=' read -r key value; do
+   case $key in
+       ''|\#*) continue ;;         # skip blank lines and lines starting with #
+   esac
+   # stuff with var1, etc.
+   eval "${key}='${value}'"
+done < "${configuration}"
+
+while [[ "$#" > 0 ]]; do case $1 in
+  --mode) export mode="$2";;
 	--sources) export sources="$2";;
+	--debug) debug="true";;
+	--log) log="true";;
     *) break;;
   esac; shift; shift
 done
 
-#. config/config.properties
-
-
-#if [ -z "$mode" ]; then
-#	echo "No running mode specified"
-#	exit
-#fi
-
-echo "$mode"
-echo "$sources"
-
+echo "Starting Up..."
 if [ "$mode" != "transform" ]; then
 	if [ "$sources" != "rdfstream" ]; then
+     
+     echo "Starting up Fuseki..."
 	   cd fuseki
-	#   if [ "$file" = "" ]; then
-	      java -jar jena-fuseki-server-2.3.1.jar --update --mem /ds &
-	#   else
-	#      java -jar jena-fuseki-server-2.3.1.jar --mem --update /ds &
+	   java -jar jena-fuseki-server-2.3.1.jar --update --mem /ds &
 	   cd ..
+    echo "the Fuseki pid is $!"
 	   sleep 10
 	fi
-else
-   echo "don't start fuseki"
 fi
 
+echo "Starting up TripleWave ..."
 
-echo "the fuseki pid is $!"
-
-DEBUG=* node app.js --fuseki=$! --mode="$mode" --configuration="$configuration" --sources="$sources"
+if [ -z "${log}" ]; then
+  if [ -z "${debug}" ]; then
+    node app.js --fuseki=$! --mode="$mode" --configuration="$configuration" --sources="$sources"
+  else
+    echo "Starting in debug mode"
+    node debug app.js --fuseki=$! --mode="$mode" --configuration="$configuration" --sources="$sources"
+  fi
+else
+  if [ -z "${debug}" ]; then
+    DEBUG=* node app.js --fuseki=$! --mode="$mode" --configuration="$configuration" --sources="$sources"
+  else
+    echo "Starting in debug mode"
+    DEBUG=* node debug app.js --fuseki=$! --mode="$mode" --configuration="$configuration" --sources="$sources"
+  fi
+fi
 
