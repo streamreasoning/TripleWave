@@ -1,6 +1,9 @@
 *~
 fuseki/run
 
+# configuration
+config/config.properties
+
 # Logs
 logs
 *.log
