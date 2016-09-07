@@ -1,4 +1,5 @@
 ---
+category: ''
 path: ''
 title: 'Consuming the TripleWave data'
 type: 'RSP-Services'
