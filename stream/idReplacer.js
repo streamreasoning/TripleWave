@@ -24,6 +24,7 @@ class IdReplacer extends stream.Transform {
         }
 
         data['@id'] = idCreator(data,this.configuration);
+        data['@graph']['@id'] = data['@id'];
 
         this.push(data);
         return cb()

@@ -53,7 +53,7 @@ class SparqlDataGen extends stream.Readable {
         var transformInput = function (callback) {
 
             if (_this.configuration.get('rdf_source') === 'rdfstream') {
-                console.log('No need to transform the file');
+                debug('No need to transform the file');
                 return callback();
             }
 
@@ -97,7 +97,7 @@ class SparqlDataGen extends stream.Readable {
         var createNewGraphs = function (callback) {
 
             if (_this.configuration.get('rdf_source') === 'rdfstream') {
-                console.log('No need to transform the file');
+                debug('No need to transform the file');
                 return callback();
             }
             var hostname = _this.configuration.get('hostname');
@@ -109,12 +109,12 @@ class SparqlDataGen extends stream.Readable {
             var query = fs.readFileSync(path.resolve(__dirname,'../../', 'rdf', 'selectGraphs.q')).toString();
             query = query.split('[hostname]').join(graphName);
 
-            console.log('creating the new graph');
-            console.log(query);
+            debug('creating the new graph');
+            debug(query);
             var client = new SparqlClient(_this.configuration.get('rdf_query_endpoint'));
 
             var createNewTriples = function (triple, cb) {
-                console.log(triple);
+                debug(triple);
                 //var insertQuery = fs.readFileSync('./rdf/insertNewTriple.q').toString();
                 var insertQuery = fs.readFileSync(path.resolve(__dirname,'../../', 'rdf', 'insertNewTriple.q')).toString();
 
@@ -127,8 +127,8 @@ class SparqlDataGen extends stream.Readable {
                 insertQuery = insertQuery.split('[g]').join(graph);
 
                 var create = 'CREATE GRAPH <' + graph + '>';
-                console.log(create);
-                console.log(insertQuery);
+                debug(create);
+                debug(insertQuery);
                 var options = {
                     url: _this.configuration.get('rdf_update_endpoint'),
                     method: 'POST',
@@ -157,10 +157,10 @@ class SparqlDataGen extends stream.Readable {
             _this.client
                 .query(query)
                 .execute(function (err, data) {
-                    if (err) return console.log(err);
+                    if (err) return debug(err);
 
                     var graphs = data.results.bindings;
-                    console.log(graphs);
+                    debug(graphs);
                     async.eachSeries(graphs, createNewTriples, function () {
                         return callback();
                     });

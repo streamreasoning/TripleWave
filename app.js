@@ -9,27 +9,23 @@ const program = require('commander');
 
 const Cache = require('./stream/cache');
 const Enricher = require('./stream/enricher');
-var configuration; 
+var configuration;
 
 // TODO: rifarlo con le promise
 let cache = null;
 let toUse = null;
 
-let parseCommandLine = function(callback){
+let parseCommandLine = function (callback) {
     program
-    .option('-m, --mode [mode]','TripleWave running mode',/^(transform|endless|replay)$/i)
-    .option('-c, --configuration [configuration]', 'Path to the configuration file')
-    .option('-s, --sources [sources]', 'Source of the data')
-    .option('--fuseki [fuseki]', 'Fuseki PID')
-    .parse(process.argv);
-
-    //debug('Mode %s',program.mode)
-    //debug('Configuration %s',program.configuration)
-    //debug('Source %s',program.source)
+        .option('-m, --mode [mode]', 'TripleWave running mode', /^(transform|endless|replay)$/i)
+        .option('-c, --configuration [configuration]', 'Path to the configuration file')
+        .option('-s, --sources [sources]', 'Source of the data')
+        .option('--fuseki [fuseki]', 'Fuseki PID')
+        .parse(process.argv);
 
     configuration = require('./configuration')(program.configuration);
-    program.mode ? configuration.set('mode',program.mode) : null;
-    program.sources ? configuration.set('sources',program.sources) : null;
+    program.mode ? configuration.set('mode', program.mode) : null;
+    program.sources ? configuration.set('sources', program.sources) : null;
 
     debug(configuration.get('mode'));
     debug(configuration.get('sources'));
@@ -38,81 +34,128 @@ let parseCommandLine = function(callback){
 
 let createStreams = function (callback) {
 
-    cache = new Cache(
-        {
-            objectMode: true,
-            limit: 100,
-            configuration:configuration
-        }
-    );
+
 
     if (configuration.get('mode') === 'replay' || configuration.get('mode') === 'endless') {
         if (configuration.get('sources') == 'rdfstream') {
-            var DataGen = require('./stream/datagen/rdfStreamDataGen');
-            var Scheduler = require('./stream/scheduler/rdfStreamScheduler');
-            var IdReplacer = require('./stream/idReplacer');
 
-            var datagen = new DataGen({
-                objectMode: true,
-                highWaterMark: 1,
-                configuration:configuration
-            });
-            var scheduler = new Scheduler({
-                objectMode: true,
-                highWaterMark: 1,
-                configuration:configuration
-            });
+            let buildStream = function () {
 
-            var idReplacer = new IdReplacer({
-                objectMode:true,
-                configuration:configuration
-            });
+                cache = new Cache(
+                    {
+                        objectMode: true,
+                        limit: 100,
+                        configuration: configuration
+                    }
+                );
 
-            //compose the stream
-            toUse = datagen.pipe(scheduler);
-            toUse = toUse.pipe(idReplacer);
-            if (configuration.get("mode") == 'endless') {
-                var Replacer = require('./stream/currentTimestampReplacer');
-                toUse = toUse.pipe(new Replacer({
+                var DataGen = require('./stream/datagen/rdfStreamDataGen');
+                var Scheduler = require('./stream/scheduler/rdfStreamScheduler');
+                var IdReplacer = require('./stream/idReplacer');
+
+                var datagen = new DataGen({
                     objectMode: true,
-                    highWaterMark: 1
-                }));
-            }
+                    highWaterMark: 1,
+                    configuration: configuration
+                });
+                var scheduler = new Scheduler({
+                    objectMode: true,
+                    highWaterMark: 1,
+                    configuration: configuration
+                });
 
-            toUse.pipe(cache);
+                var idReplacer = new IdReplacer({
+                    objectMode: true,
+                    configuration: configuration
+                });
 
-            return callback();
-
-        } else if (configuration.get('sources') == 'triples') {
-            var DataGen = require('./stream/datagen/sparqlDataGen');
-            var Scheduler = require('./stream/scheduler/rdfStreamScheduler');
-
-            debug('Using %s source', configuration.get('sources'));
-
-            var datagen = new DataGen({
-                objectMode: true,
-                highWaterMark: 1,
-                configuration:configuration
-            });
-            var scheduler = new Scheduler({
-                objectMode: true,
-                highWaterMark: 1,
-                configuration:configuration
-            });
-
-            return datagen.loadData(() => {
+                //compose the stream
                 toUse = datagen.pipe(scheduler);
+                toUse = toUse.pipe(idReplacer);
                 if (configuration.get("mode") == 'endless') {
                     var Replacer = require('./stream/currentTimestampReplacer');
                     toUse = toUse.pipe(new Replacer({
                         objectMode: true,
                         highWaterMark: 1
                     }));
-                }
 
+                    toUse.on('end', () => {
+                        debug("Stream ended")
+
+                        buildStream();
+
+                        debug('Restarted');
+                    });
+                }
                 toUse.pipe(cache);
-                return callback();
-            });
+
+
+            };
+
+            buildStream();
+
+            return callback();
+        } else if (configuration.get('sources') == 'triples') {
+            var DataGen = require('./stream/datagen/sparqlDataGen');
+            var Scheduler = require('./stream/scheduler/rdfStreamScheduler');
+            debug('Using %s source', configuration.get('sources'));
+
+            let buildStream = function (restart) {
+
+                cache = new Cache(
+                    {
+                        objectMode: true,
+                        limit: 100,
+                        configuration: configuration
+                    }
+                );
+
+                var datagen = new DataGen({
+                    objectMode: true,
+                    highWaterMark: 1,
+                    configuration: configuration
+                });
+                var scheduler = new Scheduler({
+                    objectMode: true,
+                    highWaterMark: 1,
+                    configuration: configuration
+                });
+
+                if (!restart) {
+                    return datagen.loadData(() => {
+                        toUse = datagen.pipe(scheduler);
+                        if (configuration.get("mode") == 'endless') {
+                            var Replacer = require('./stream/currentTimestampReplacer');
+                            toUse = toUse.pipe(new Replacer({
+                                objectMode: true,
+                                highWaterMark: 1
+                            }));
+
+                            toUse.on('end', () => {
+                                debug("Restarting the stream");
+                                buildStream(true);
+                            })
+                        }
+
+                        toUse.pipe(cache);
+                        return callback();
+                    });
+                } else {
+                    var Replacer = require('./stream/currentTimestampReplacer');
+                    toUse = toUse.pipe(new Replacer({
+                        objectMode: true,
+                        highWaterMark: 1
+                    }));
+                    toUse.pipe(cache);
+
+                    toUse.on('end', () => {
+                        debug("Restarting the stream");
+                        buildStream(true);
+                    })
+                }
+            }
+
+            return buildStream(false);
         }
 
         /*toUse = toUse.pipe(new stream.Writable({
@@ -121,6 +164,14 @@ let createStreams = function (callback) {
         }));*/
 
     } else if (configuration.get('mode') === 'transform') {
+
+        cache = new Cache(
+            {
+                objectMode: true,
+                limit: 100,
+                configuration: configuration
+            }
+        );
         let stream = path.resolve(configuration.get('transform_folder'), configuration.get('transform_transformer'));
         debug('Loading stream %s', stream);
         var Webstream = require(stream);
@@ -129,15 +180,15 @@ let createStreams = function (callback) {
 
         var enricher = new Enricher({
             objectMode: true,
-            configuration:configuration
+            configuration: configuration
         });
         var activeStream = new Webstream({
             objectMode: true,
-            configuration:configuration
+            configuration: configuration
         });
-         var idReplacer = new IdReplacer({
+        var idReplacer = new IdReplacer({
             objectMode: true,
-            configuration:configuration
+            configuration: configuration
         });
 
         toUse = activeStream.pipe(enricher);
@@ -153,7 +204,7 @@ let createStreams = function (callback) {
         var Scheduler = require('./stream/scheduler/dummyScheduler');
         var datagen = new DataGen({
             objectMode: true,
-            configuration:configuration
+            configuration: configuration
         });
         var scheduler = new Scheduler({
             objectMode: true,

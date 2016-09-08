@@ -29,6 +29,7 @@ Cache.prototype._write = function(data, enc, callback) {
     ts: new Date(data['http://www.w3.org/ns/prov#generatedAtTime']).getTime()
   }, _.pick(data, ['http://www.w3.org/ns/prov#generatedAtTime', '@id', '@graph'])));
 
+  debug("Adding %j",data);
   callback();
 };
 
@@ -44,9 +45,6 @@ Cache.prototype.find = function(id) {
   for (var i = this.array.length - 1; i >= 0; i--) {
     var e = this.array[i];
 
-    console.log(e['@id']);
-    console.log(id);
-
     let splittedId = e['@id'].split('/'); 
     if (splittedId[splittedId.length-1] === id) {
       return e;
@@ -56,6 +54,9 @@ Cache.prototype.find = function(id) {
   return null;
 };
 
+Cache.prototype.clean = function(){
+  this.array = [];
+}
 Cache.prototype.getAll = function() {
 
   var array = _.clone(this.array);
