@@ -50,6 +50,7 @@ let createStreams = function (callback) {
         if (configuration.get('sources') == 'rdfstream') {
             var DataGen = require('./stream/datagen/rdfStreamDataGen');
             var Scheduler = require('./stream/scheduler/rdfStreamScheduler');
+            var IdReplacer = require('./stream/idReplacer');
 
             var datagen = new DataGen({
                 objectMode: true,
@@ -62,8 +63,14 @@ let createStreams = function (callback) {
                 configuration:configuration
             });
 
+            var idReplacer = new IdReplacer({
+                objectMode:true,
+                configuration:configuration
+            });
+
             //compose the stream
             toUse = datagen.pipe(scheduler);
+            toUse = toUse.pipe(idReplacer);
             if (configuration.get("mode") == 'endless') {
                 var Replacer = require('./stream/currentTimestampReplacer');
                 toUse = toUse.pipe(new Replacer({
@@ -115,9 +122,10 @@ let createStreams = function (callback) {
 
     } else if (configuration.get('mode') === 'transform') {
         let stream = path.resolve(configuration.get('transform_folder'), configuration.get('transform_transformer'));
-        debug('loadgin stream %s', stream);
+        debug('Loading stream %s', stream);
         var Webstream = require(stream);
 
+        let IdReplacer = require('./stream/idReplacer');
 
         var enricher = new Enricher({
             objectMode: true,
@@ -127,8 +135,14 @@ let createStreams = function (callback) {
             objectMode: true,
             configuration:configuration
         });
-        enricher.pipe(cache);
+         var idReplacer = new IdReplacer({
+            objectMode: true,
+            configuration:configuration
+        });
+
         toUse = activeStream.pipe(enricher);
+        toUse = toUse.pipe(idReplacer);
+        toUse.pipe(cache);
 
         return callback();
     }

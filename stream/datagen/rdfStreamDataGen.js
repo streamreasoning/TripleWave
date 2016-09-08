@@ -15,27 +15,14 @@ class RdfStreamDataGen extends stream.PassThrough {
         debug('File path', filePath);
         var file = fs.createReadStream(filePath)
 
-        let idCreator = function (data) {
-
-            let splittedId = data['@id'].split('/');
-
-            let id = splittedId[splittedId.length - 1];
-
-            let dataId = 'http://' + (options.configuration.get('externalAddress') || (options.configuration.get('hostname') + ':' + options.configuration.get('port'))) + '/' + id;
-
-            return dataId;
-        }
-
 
         let _this = this;
         file.pipe(JSONStream.parse('*'))
+            .pipe(this)
             .on('data', (data) => {
                 debug(data);
                 debug("-----------");
-                data['@id'] = idCreator(data);
-                _this.push(data);
             })
-          //.pipe(this)
 /*          .pipe((graph) => {
                 this.push(graph)
                 return oboe.drop;
