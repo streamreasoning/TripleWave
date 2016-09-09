@@ -34,10 +34,8 @@ let parseCommandLine = function (callback) {
 
 let createStreams = function (callback) {
 
-
-
     if (configuration.get('mode') === 'replay' || configuration.get('mode') === 'endless') {
-        if (configuration.get('sources') == 'rdfstream') {
+        if (configuration.get('sources') === 'rdfstream') {
 
             let buildStream = function () {
 
@@ -95,7 +93,7 @@ let createStreams = function (callback) {
             buildStream();
 
             return callback();
-        } else if (configuration.get('sources') == 'triples') {
+        } else if (configuration.get('sources') === 'triples') {
             var DataGen = require('./stream/datagen/sparqlDataGen');
             var Scheduler = require('./stream/scheduler/rdfStreamScheduler');
             debug('Using %s source', configuration.get('sources'));
@@ -141,6 +139,9 @@ let createStreams = function (callback) {
                         return callback();
                     });
                 } else {
+
+                    // Don't check if TW is in endless mode since this branch is only executed in endless mode
+                    toUse = datagen.pipe(scheduler);
                     var Replacer = require('./stream/currentTimestampReplacer');
                     toUse = toUse.pipe(new Replacer({
                         objectMode: true,
