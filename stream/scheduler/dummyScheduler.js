@@ -11,7 +11,7 @@ class DummyScheduler extends stream.Transform {
         console.log("I am forwarding \n\t", data);
         const error = null;
         return cb(error);
-      }, 2000);
+      }, 500);
   }
 }
 
