@@ -263,7 +263,8 @@ let startUp = function (callback) {
 
     let primus = Primus.createServer({
         port: configuration.get('ws_port'),
-        transformer: 'websockets'
+        transformer: 'websockets',
+        timeout:false
     });
 
 
