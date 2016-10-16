@@ -48,7 +48,8 @@ let createStreams = function (callback) {
                 );
 
                 var DataGen = require('./stream/datagen/rdfStreamDataGen');
-                var Scheduler = require('./stream/scheduler/rdfStreamScheduler');
+                //var Scheduler = require('./stream/scheduler/rdfStreamScheduler');
+                var Scheduler = require('./stream/scheduler/streamScaler');
                 var IdReplacer = require('./stream/idReplacer');
 
                 var datagen = new DataGen({
@@ -59,7 +60,8 @@ let createStreams = function (callback) {
                 var scheduler = new Scheduler({
                     objectMode: true,
                     highWaterMark: 1,
-                    configuration: configuration
+                    configuration: configuration,
+                    scale:10
                 });
 
                 var idReplacer = new IdReplacer({
