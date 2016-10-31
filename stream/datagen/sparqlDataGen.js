@@ -15,6 +15,7 @@ class SparqlDataGen extends stream.Readable {
         this.configuration = options.configuration;
         this.firstIteration = true;
         this.endpoint = options.configuration.get('rdf_query_endpoint');
+        this.remote = option.configuration.get('rdf_remote');
         this.client = new SparqlClient(this.endpoint);
         this.bindings = null;
     }
@@ -167,7 +168,13 @@ class SparqlDataGen extends stream.Readable {
                 });
         }
 
-        var actions = [loadFile, transformInput, createNewGraphs];
+        var actions; 
+        
+        if(!this.remote){
+            actions = [loadFile, transformInput, createNewGraphs];
+        }else{
+            actions = [transformInput, createNewGraphs];
+        }
 
         return async.series(actions, callback)
 
