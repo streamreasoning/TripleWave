@@ -167,6 +167,7 @@ class SparqlDataGen extends stream.Readable {
                 });
         }
 
+        // test
         var actions = [loadFile, transformInput, createNewGraphs];
 
         return async.series(actions, callback)
