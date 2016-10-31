@@ -15,7 +15,7 @@ class SparqlDataGen extends stream.Readable {
         this.configuration = options.configuration;
         this.firstIteration = true;
         this.endpoint = options.configuration.get('rdf_query_endpoint');
-        this.remote = option.configuration.get('rdf_remote');
+        this.remote = options.configuration.get('rdf_remote');
         this.client = new SparqlClient(this.endpoint);
         this.bindings = null;
     }
