@@ -9,6 +9,7 @@ const program = require('commander');
 
 const Cache = require('./stream/cache');
 const Enricher = require('./stream/enricher');
+const MQTTOut = require('./stream/mqttOutput')
 var configuration;
 
 // TODO: rifarlo con le promise
@@ -265,6 +266,11 @@ let startUp = function (callback) {
         port: configuration.get('ws_port'),
         transformer: 'websockets'
     });
+
+    let mqttServer = new MQTTOut({
+		    objectMode: true,
+                    configuration: configuration});
+    toUse.pipe(mqttServer);
 
 
     primus.on('initialised', () => {
