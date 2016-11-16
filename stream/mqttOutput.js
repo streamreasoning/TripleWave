@@ -10,9 +10,9 @@ const debug = require('debug')('MQTTOut')
 function MQTTOut(options) {
 
   var configuration = options.configuration;
-  this.mqttClient = mqtt.connect('mqtt://localhost:1883');
+  this.mqttClient = mqtt.connect('mqtt://', configuration.get('mqtt_broker_address'), ':', configuration.get('mqtt_broker_port'));
   this.mqttClient.on('connect', () => {
-    this.mqttClient.subscribe('twave');
+    this.mqttClient.subscribe(configuration.get('mqtt_topic'));
   });
 
   // allow use without new
