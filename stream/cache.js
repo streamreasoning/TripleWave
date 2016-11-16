@@ -75,7 +75,10 @@ Cache.prototype.getAll = function() {
     }
   };
 
-  cache['sld:streamLocation'] = this.configuration.get('ws_address');
+  if(this.configuration.get('ws_enabled'))
+    cache['sld:streamLocation'] = this.configuration.get('ws_address');
+  if(this.configuration.get('mqtt_enabled'))
+    cache['sld:mqttStreamLocation'] = 'mqtt://' + this.configuration.get('mqtt_broker_address') + ':' + this.configuration.get('mqtt_broker_port');
   cache['sld:tBoxLocation'] = {
     "@id": this.configuration.get('tbox_stream_location')
   };

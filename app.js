@@ -262,35 +262,45 @@ let startUp = function (callback) {
 
     let server = require('http').createServer(app)
 
-    let primus = Primus.createServer({
-        port: configuration.get('ws_port'),
-        transformer: 'websockets'
-    });
-
-    let mqttServer = new MQTTOut({
+    if(configuration.get('mqtt_enabled')){
+        debug('MQTT is enabled, connecting to the broker');
+        let mqttServer = new MQTTOut({
 		    objectMode: true,
                     configuration: configuration});
-    toUse.pipe(mqttServer);
+        toUse.pipe(mqttServer);
+    }
 
+    if(configuration.get('ws_enabled')){
+        debug('WS is enabled, setting up the server');
 
-    primus.on('initialised', () => {
-        primus.on('connection', (spark) => {
-            debug("Someone connected and I'm starting to provide him data");
-            toUse.pipe(spark);
+        let primus = Primus.createServer({
+            port: configuration.get('ws_port'),
+            transformer: 'websockets'
         });
 
-        primus.on('disconnection', (spark) => {
-            debug("Someone disconnected and he doesn't deserve my data anymore");
-            toUse.unpipe(spark);
-        });
 
+        primus.on('initialised', () => {
+            primus.on('connection', (spark) => {
+                debug("Someone connected and I'm starting to provide him data");
+                toUse.pipe(spark);
+            });
+
+            primus.on('disconnection', (spark) => {
+                debug("Someone disconnected and he doesn't deserve my data anymore");
+                toUse.unpipe(spark);
+            });
+
+            app.listen(configuration.get('port'), () => {
+                debug('HTTP and WebSocket servers ready');
+               return callback();
+            })
+        });
+    } else {
         app.listen(configuration.get('port'), () => {
-            debug('HTTP and WebSocket servers ready');
-            return callback();
-        })
-    });
-
-
+           debug('HTTP and WebSocket servers ready');
+           return callback();
+        });
+    }
 };
 
 async.series([parseCommandLine, createStreams, startUp], () => {
