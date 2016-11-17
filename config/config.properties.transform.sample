@@ -8,12 +8,14 @@ path=/TripleWave-transform
 # external address (use in case of proxy)
 externaladdress=131.175.141.249/TripleWave-transform
 
-mode=transform
+#######################
+# Stream distribution #
+#######################
 
-# name of the js file that needs to be loaded to retrieve the web stream
-stream_name=wikiStream.js
-# file of the r2rml transformation
-stream_mapping=wiki.r2rml
+# Web sockets #
+###############
+
+ws_enabled=true
 
 # endpoint for the websocket
 ws_stream_location=/TripleWave-transform/stream
@@ -21,6 +23,28 @@ ws_port=8124
 
 # where is possobile to connect to the wesbsocket (should match you apache / ngix configuration)
 ws_address=ws://131.175.141.249/TripleWave-transform/stream
+
+# mqtt #
+########
+mqtt_enabled=false
+
+# mqtt connection to broker
+mqtt_broker_address=localhost
+mqtt_broker_port=1883
+
+# mqtt topic 
+mqtt_topic=twave
+
+##########################
+# Streamer configuration #
+##########################
+
+mode=transform
+
+# name of the js file that needs to be loaded to retrieve the web stream
+stream_name=wikiStream.js
+# file of the r2rml transformation
+stream_mapping=wiki.r2rml
 
 # location of the tbox
 tbox_stream_location=http://purl.oclc.org/NET/ssnx/ssn
