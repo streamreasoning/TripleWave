@@ -8,7 +8,7 @@ INSERT{
 }
 WHERE {
   GRAPH <http://example/input>{
-  [pattern]
+  ?key <http://knoesis.wright.edu/ssw/ont/sensor-observation.owl#samplingTime> ?time . ?time <http://www.w3.org/2006/time#inXSDDateTime> ?ts
   BIND (iri(concat("[graphname]/",afn:localname(?key))) AS ?g)
  } 
 }

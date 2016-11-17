@@ -2,10 +2,10 @@ PREFIX afn: <http://jena.hpl.hp.com/ARQ/function#>
 
 WITH <[g]>
 INSERT{
-[pattern]
+?key ?p ?o
 }
 WHERE {
   GRAPH <http://example/input>{
-[pattern]
+  ?key ?p ?o
  } 
 } 

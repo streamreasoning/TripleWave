@@ -64,6 +64,7 @@ class SparqlDataGen extends stream.Readable {
 
             var graphName = 'http://' + (_this.configuration.get('externaladdress') || (hostname + ':' + port + location));
 
+
             var create = fs.readFileSync(path.resolve(__dirname,'../../', 'rdf', 'createGraph.q')).toString();
             create = create.split('[hostname]').join(graphName);
 
@@ -82,12 +83,16 @@ class SparqlDataGen extends stream.Readable {
             request.post(options, function (error) {
                 if (error) return callback(error);
 
-                var pattern = _this.configuration.get('rdf_stream_item_pattern');
+                //var pattern = _this.configuration.get('rdf_stream_item_pattern');
                 //var query = fs.readFileSync('./rdf/insertQuery.q').toString();
-                var query = fs.readFileSync(path.resolve(__dirname,'../../','rdf','insertQuery.q')).toString();
-                query = query.split('[graphname]').join(graphName);
-                query = query.split('[pattern]').join(pattern);
+                //var query = fs.readFileSync(path.resolve(__dirname,'../../','rdf','insertQuery.q')).toString();
+                //query = query.split('[graphname]').join(graphName);
+                //query = query.split('[pattern]').join(pattern);
 
+                var queryPath = _this.configuration.get('rdf_insert_query');
+                
+                var query = fs.readFileSync(path.resolve(__dirname,'../',queryPath)).toString();
+                query = query.split('[graphname]').join(graphName);
                 debug(query);
                 options.form.update = query;
 
@@ -117,13 +122,14 @@ class SparqlDataGen extends stream.Readable {
             var createNewTriples = function (triple, cb) {
                 debug(triple);
                 //var insertQuery = fs.readFileSync('./rdf/insertNewTriple.q').toString();
-                var insertQuery = fs.readFileSync(path.resolve(__dirname,'../../', 'rdf', 'insertNewTriple.q')).toString();
+                var insertQueryPath = _this.configuration.get('rdf_insert_new_triple')
+                var insertQuery = fs.readFileSync(path.resolve(__dirname,'../',insertQueryPath)).toString();
 
                 var graph = triple.graph.value;
                 var key = triple.key.value;
 
-                var pattern = _this.configuration.get('rdf_stream_item_content_pattern');
-                insertQuery = insertQuery.split('[pattern]').join(pattern);
+               // var pattern = _this.configuration.get('rdf_stream_item_content_pattern');
+               // insertQuery = insertQuery.split('[pattern]').join(pattern);
                 insertQuery = insertQuery.split('?key').join('<' + key + '>');
                 insertQuery = insertQuery.split('[g]').join(graph);
 
