@@ -75,10 +75,15 @@ Cache.prototype.getAll = function() {
     }
   };
 
-  if(this.configuration.get('ws_enabled'))
+  cache['sld:streamEndpoint']=[];
+  if(this.configuration.get('ws_enabled')){
+    //DEPRECATED: this line should be dismissed, since more endpoints are now possible
     cache['sld:streamLocation'] = this.configuration.get('ws_address');
-  if(this.configuration.get('mqtt_enabled'))
-    cache['sld:mqttStreamLocation'] = 'mqtt://' + this.configuration.get('mqtt_broker_address') + ':' + this.configuration.get('mqtt_broker_port');
+    cache['sld:streamEndpoint'].push({'rdf:type':{'@id':'sld:WebSocketStreamEndpoint'},'@id':this.configuration.get('ws_address')});
+  }
+  if(this.configuration.get('mqtt_enabled')){
+    cache['sld:streamEndpoint'].push({'rdf:type':{'@id':'sld:MQTTStreamEndpoint'},'@id':'mqtt://' + this.configuration.get('mqtt_broker_address') + ':' + this.configuration.get('mqtt_broker_port'),'sld:mqttTopic':this.configuration.get('mqtt_topic')});
+  }
   cache['sld:tBoxLocation'] = {
     "@id": this.configuration.get('tbox_stream_location')
   };

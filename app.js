@@ -239,6 +239,10 @@ let startUp = function (callback) {
         })
     });
 
+    app.get('/', function(req, res) {
+        return res.json(cache.getAll());
+    });
+
     app.get('/sgraph', function (req, res) {
         return res.json(cache.getAll());
     });
