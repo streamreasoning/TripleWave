@@ -33,8 +33,8 @@ while [[ "$#" > 0 ]]; do case $1 in
 done
 
 echo "Starting Up..."
-if [ "$mode" != "transform" ]; then
-	if [ "$sources" != "rdfstream" ]; then
+if [ "$mode" != "transform"]; then
+	if [ "$sources" != "rdfstream" || "$sources" != "stream" ]; then
      
      echo "Starting up Fuseki..."
 	   cd fuseki

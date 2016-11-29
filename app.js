@@ -34,7 +34,9 @@ let parseCommandLine = function (callback) {
 
 let createStreams = function (callback) {
 
-    if (configuration.get('mode') === 'replay' || configuration.get('mode') === 'endless') {
+
+    if (configuration.get('mode') != 'transform') {
+
         if (configuration.get('sources') === 'rdfstream') {
 
             let buildStream = function () {
@@ -57,6 +59,7 @@ let createStreams = function (callback) {
                     highWaterMark: 1,
                     configuration: configuration
                 });
+
                 var scheduler = new Scheduler({
                     objectMode: true,
                     highWaterMark: 1,
@@ -159,14 +162,70 @@ let createStreams = function (callback) {
             }
 
             return buildStream(false);
+        } else if (configuration.get('sources') === 'stream'){
+            let buildStream = function () {
+
+                cache = new Cache(
+                    {
+                        objectMode: true,
+                        limit: 100,
+                        configuration: configuration
+                    }
+                );
+
+                var DataGen = require('./stream/datagen/obdaDataGen');
+                //var Scheduler = require('./stream/scheduler/rdfStreamScheduler');
+                var Scheduler = require('./stream/scheduler/streamScaler');
+                var IdReplacer = require('./stream/idReplacer');
+
+                var datagen = new DataGen({
+                    objectMode: true,
+                    highWaterMark: 1,
+                    configuration: configuration
+                });
+
+                var scheduler = new Scheduler({
+                    objectMode: true,
+                    highWaterMark: 1,
+                    configuration: configuration,
+                    scale:10
+                });
+
+                var idReplacer = new IdReplacer({
+                    objectMode: true,
+                    configuration: configuration
+                });
+
+                //compose the stream
+                toUse = datagen.pipe(scheduler);
+                toUse = toUse.pipe(idReplacer);
+                if (configuration.get("mode") == 'endless') {
+                    var Replacer = require('./stream/currentTimestampReplacer');
+                    toUse = toUse.pipe(new Replacer({
+                        objectMode: true,
+                        highWaterMark: 1
+                    }));
+
+                    toUse.on('end', () => {
+                        debug("Stream ended")
+
+                        buildStream();
+
+                        debug('Restarted');
+                    });
+                }
+                toUse.pipe(cache);
+
+
+            };
+
+            buildStream();
+
+            return callback();
+
         }
 
-        /*toUse = toUse.pipe(new stream.Writable({
-            objectMode: true,
-            write: (a, b, cb) => cb()
-        }));*/
-
-    } else if (configuration.get('mode') === 'transform') {
+    } else {
 
         cache = new Cache(
             {
@@ -175,6 +234,7 @@ let createStreams = function (callback) {
                 configuration: configuration
             }
         );
+
         let stream = path.resolve(configuration.get('transform_folder'), configuration.get('transform_transformer'));
         debug('Loading stream %s', stream);
         var Webstream = require(stream);
@@ -221,11 +281,9 @@ let createStreams = function (callback) {
 
 };
 
-
-
 let startUp = function (callback) {
 
-    // starting up the http and websocket servers 
+    debug ("starting up the http and websocket servers")
     let app = express();
 
     app.get('/stream', (req, res) => {
