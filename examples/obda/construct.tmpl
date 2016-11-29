@@ -1,0 +1,17 @@
+PREFIX : <http://www.streamreasoning.org/ontologies/rsplab/citybench.owl#>
+PREFIX ct: <http://www.insight-centre.org/citytraffic#>
+PREFIX ssn: <http://purl.oclc.org/NET/ssnx/ssn#>
+PREFIX ses: <http://www.streamreasoning.org/ontologies/rsplab/citybench.owl#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+
+CONSTRUCT {
+$observation rdf:type ssn:Observation ; 
+    ct:hasValue ?value ;
+    ssn:observedBy ?sensor ;
+    ssn:observedProperty ?property .
+}
+WHERE { 
+$observation  ct:hasValue ?value ;
+    ssn:observedBy ?sensor ;
+    ssn:observedProperty ?property .
+}

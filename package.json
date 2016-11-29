@@ -20,7 +20,7 @@
     "primus": "^6.0.1",
     "properties-reader": "0.0.15",
     "ps-node": "0.0.5",
-    "rdflib": "^0.6.1",
+    "rdflib": "^0.8.0",
     "request": "^2.72.0",
     "socket.io-client": "^0.9.1",
     "sparql-client-2": "github:eddieantonio/node-sparql-client",
