@@ -228,7 +228,8 @@ let startUp = function (callback) {
     // starting up the http and websocket servers 
     let app = express();
 
-    app.get('/stream', (req, res) => {
+    let path = configuration.get('path');
+    app.get(path+'/stream', (req, res) => {
 
         toUse
             .pipe(JSONStream.stringify())
@@ -240,11 +241,11 @@ let startUp = function (callback) {
         })
     });
 
-    app.get('/sgraph', function (req, res) {
+    app.get(path+'/sgraph', function (req, res) {
         return res.json(cache.getAll());
     });
 
-    app.get('/:id', function (req, res) {
+    app.get(path+'/:id', function (req, res) {
         debug('Searching element with id ' + req.params.id);
 
         var element = cache.find(req.params.id);
