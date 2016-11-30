@@ -18,7 +18,7 @@ class IdReplacer extends stream.Transform {
 
             let id = splittedId[splittedId.length - 1];
 
-            let dataId = 'http://' + (configuration.get('externalAddress') || (configuration.get('hostname') + ':' + configuration.get('port'))) + '/' + id;
+            let dataId = 'http://' + (configuration.get('externaladdress') || (configuration.get('hostname') + ':' + configuration.get('port'))) + '/' + id;
 
             return dataId;
         }
