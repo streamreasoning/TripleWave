@@ -17,7 +17,7 @@ let toUse = null;
 
 let parseCommandLine = function (callback) {
     program
-        .option('-m, --mode [mode]', 'TripleWave running mode', /^(transform|endless|replay)$/i)
+        .option('-m, --mode [mode]', 'TripleWave running mode', /^(transform|endless|replay|endless_profiled)$/i)
         .option('-c, --configuration [configuration]', 'Path to the configuration file')
         .option('-s, --sources [sources]', 'Source of the data')
         .option('--fuseki [fuseki]', 'Fuseki PID')
@@ -34,7 +34,7 @@ let parseCommandLine = function (callback) {
 
 let createStreams = function (callback) {
 
-    if (configuration.get('mode') === 'replay' || configuration.get('mode') === 'endless') {
+    if (configuration.get('mode') !== 'transform') {
         if (configuration.get('sources') === 'rdfstream') {
 
             let buildStream = function () {
@@ -47,37 +47,37 @@ let createStreams = function (callback) {
                     }
                 );
 
+                let options = {
+                    objectMode: true,
+                    highWaterMark: 1,
+                    configuration: configuration
+                }
+
                 var DataGen = require('./stream/datagen/rdfStreamDataGen');
-                //var Scheduler = require('./stream/scheduler/rdfStreamScheduler');
-                var Scheduler = require('./stream/scheduler/streamScaler');
+                var Scheduler;
+                
+                if(configuration.get('mode')==='endless_profiled'){
+                    Scheduler = require('./stream/scheduler/profilerScheduler')
+                    options.profilingFunction = require('./stream/scheduler/profilingFunctions/'+configuration.get('profiling_function'));
+                    options.min=10;
+                }else{
+                    Scheduler = require('./stream/scheduler/rdfStreamScheduler');
+                }
+
+                //var Scheduler = require('./stream/scheduler/streamScaler');
                 var IdReplacer = require('./stream/idReplacer');
 
-                var datagen = new DataGen({
-                    objectMode: true,
-                    highWaterMark: 1,
-                    configuration: configuration
-                });
-                var scheduler = new Scheduler({
-                    objectMode: true,
-                    highWaterMark: 1,
-                    configuration: configuration,
-                    scale:10
-                });
+                var datagen = new DataGen(options);
+                var scheduler = new Scheduler(options);
 
-                var idReplacer = new IdReplacer({
-                    objectMode: true,
-                    configuration: configuration
-                });
+                var idReplacer = new IdReplacer(options);
 
                 //compose the stream
                 toUse = datagen.pipe(scheduler);
                 toUse = toUse.pipe(idReplacer);
-                if (configuration.get("mode") == 'endless') {
+                if (configuration.get("mode") == 'endless' || configuration.get("mode") == 'endless_profiled') {
                     var Replacer = require('./stream/currentTimestampReplacer');
-                    toUse = toUse.pipe(new Replacer({
-                        objectMode: true,
-                        highWaterMark: 1
-                    }));
+                    toUse = toUse.pipe(new Replacer(options));
 
                     toUse.on('end', () => {
                         debug("Stream ended")
@@ -87,6 +87,8 @@ let createStreams = function (callback) {
                         debug('Restarted');
                     });
                 }
+
+                
                 toUse.pipe(cache);
 
 
@@ -97,7 +99,6 @@ let createStreams = function (callback) {
             return callback();
         } else if (configuration.get('sources') === 'triples') {
             var DataGen = require('./stream/datagen/sparqlDataGen');
-            var Scheduler = require('./stream/scheduler/rdfStreamScheduler');
             debug('Using %s source', configuration.get('sources'));
 
             let buildStream = function (restart) {
@@ -110,26 +111,31 @@ let createStreams = function (callback) {
                     }
                 );
 
-                var datagen = new DataGen({
+                let options = {
                     objectMode: true,
                     highWaterMark: 1,
                     configuration: configuration
-                });
-                var scheduler = new Scheduler({
-                    objectMode: true,
-                    highWaterMark: 1,
-                    configuration: configuration
-                });
+                }
+
+                var Scheduler;
+                
+                if(configuration.get('mode')==='endless_profiled'){
+                    Scheduler = require('./stream/scheduler/profilerScheduler')
+                    options.profilingFunction = require('./stream/scheduler/profilingFunctions/'+configuration.get('profiling_function'));
+                    options.min=10;
+                }else{
+                    Scheduler = require('./stream/scheduler/rdfStreamScheduler');
+                }
+                
+                var datagen = new DataGen(options);
+                var scheduler = new Scheduler(options);
 
                 if (!restart) {
                     return datagen.loadData(() => {
                         toUse = datagen.pipe(scheduler);
                         if (configuration.get("mode") == 'endless') {
                             var Replacer = require('./stream/currentTimestampReplacer');
-                            toUse = toUse.pipe(new Replacer({
-                                objectMode: true,
-                                highWaterMark: 1
-                            }));
+                            toUse = toUse.pipe(new Replacer(options));
 
                             toUse.on('end', () => {
                                 debug("Restarting the stream");
@@ -145,10 +151,7 @@ let createStreams = function (callback) {
                     // Don't check if TW is in endless mode since this branch is only executed in endless mode
                     toUse = datagen.pipe(scheduler);
                     var Replacer = require('./stream/currentTimestampReplacer');
-                    toUse = toUse.pipe(new Replacer({
-                        objectMode: true,
-                        highWaterMark: 1
-                    }));
+                    toUse = toUse.pipe(new Replacer(options));
                     toUse.pipe(cache);
 
                     toUse.on('end', () => {
