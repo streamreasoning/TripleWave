@@ -35,6 +35,7 @@ let parseCommandLine = function (callback) {
 let createStreams = function (callback) {
 
     if (configuration.get('mode') !== 'transform') {
+
         if (configuration.get('sources') === 'rdfstream') {
 
             let buildStream = function () {
@@ -52,6 +53,7 @@ let createStreams = function (callback) {
                     highWaterMark: 1,
                     configuration: configuration
                 }
+
 
                 var DataGen = require('./stream/datagen/rdfStreamDataGen');
                 var Scheduler;
@@ -162,14 +164,7 @@ let createStreams = function (callback) {
             }
 
             return buildStream(false);
-        }
-
-        /*toUse = toUse.pipe(new stream.Writable({
-            objectMode: true,
-            write: (a, b, cb) => cb()
-        }));*/
-
-    } else if (configuration.get('mode') === 'transform') {
+    } else if (configuration.get('mode') === 'transform'){
 
         cache = new Cache(
             {
@@ -178,6 +173,7 @@ let createStreams = function (callback) {
                 configuration: configuration
             }
         );
+
         let stream = path.resolve(configuration.get('transform_folder'), configuration.get('transform_transformer'));
         debug('Loading stream %s', stream);
         var Webstream = require(stream);
@@ -204,7 +200,7 @@ let createStreams = function (callback) {
         return callback();
     }
 
-    if (toUse === null) {
+    else {
         debug('Using dummy data');
         var DataGen = require('./stream/datagen/dummyDataGen');
         var Scheduler = require('./stream/scheduler/dummyScheduler');
@@ -224,11 +220,9 @@ let createStreams = function (callback) {
 
 };
 
-
-
 let startUp = function (callback) {
 
-    // starting up the http and websocket servers 
+    debug ("starting up the http and websocket servers")
     let app = express();
 
     app.get('/stream', (req, res) => {
