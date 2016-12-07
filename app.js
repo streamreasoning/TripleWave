@@ -30,7 +30,7 @@ let parseCommandLine = function (callback) {
     debug(configuration.get('mode'));
     debug(configuration.get('sources'));
     return callback();
-}
+};
 
 let createStreams = function (callback) {
 
@@ -45,8 +45,8 @@ let createStreams = function (callback) {
                         objectMode: true,
                         limit: 100,
                         configuration: configuration
-                    }
-                );
+                    });
+
 
                 let options = {
                     objectMode: true,
@@ -57,16 +57,15 @@ let createStreams = function (callback) {
 
                 var DataGen = require('./stream/datagen/rdfStreamDataGen');
                 var Scheduler;
-                
-                if(configuration.get('mode')==='endless_profiled'){
+
+                if (configuration.get('mode') === 'endless_profiled') {
                     Scheduler = require('./stream/scheduler/profilerScheduler')
-                    options.profilingFunction = require('./stream/scheduler/profilingFunctions/'+configuration.get('profiling_function'));
-                    options.min=10;
-                }else{
+                    options.profilingFunction = require('./stream/scheduler/profilingFunctions/' + configuration.get('profiling_function'));
+                    options.min = 10;
+                } else {
                     Scheduler = require('./stream/scheduler/rdfStreamScheduler');
                 }
 
-                //var Scheduler = require('./stream/scheduler/streamScaler');
                 var IdReplacer = require('./stream/idReplacer');
 
                 var datagen = new DataGen(options);
@@ -90,7 +89,7 @@ let createStreams = function (callback) {
                     });
                 }
 
-                
+
                 toUse.pipe(cache);
 
 
@@ -120,15 +119,15 @@ let createStreams = function (callback) {
                 }
 
                 var Scheduler;
-                
-                if(configuration.get('mode')==='endless_profiled'){
+
+                if (configuration.get('mode') === 'endless_profiled') {
                     Scheduler = require('./stream/scheduler/profilerScheduler')
-                    options.profilingFunction = require('./stream/scheduler/profilingFunctions/'+configuration.get('profiling_function'));
-                    options.min=10;
-                }else{
+                    options.profilingFunction = require('./stream/scheduler/profilingFunctions/' + configuration.get('profiling_function'));
+                    options.min = 10;
+                } else {
                     Scheduler = require('./stream/scheduler/rdfStreamScheduler');
                 }
-                
+
                 var datagen = new DataGen(options);
                 var scheduler = new Scheduler(options);
 
@@ -164,7 +163,8 @@ let createStreams = function (callback) {
             }
 
             return buildStream(false);
-    } else if (configuration.get('mode') === 'transform'){
+        }
+    } else if (configuration.get('mode') === 'transform') {
 
         cache = new Cache(
             {
@@ -200,7 +200,7 @@ let createStreams = function (callback) {
         return callback();
     }
 
-    else {
+    if (!toUse) {
         debug('Using dummy data');
         var DataGen = require('./stream/datagen/dummyDataGen');
         var Scheduler = require('./stream/scheduler/dummyScheduler');
@@ -222,7 +222,7 @@ let createStreams = function (callback) {
 
 let startUp = function (callback) {
 
-    debug ("starting up the http and websocket servers")
+    debug("starting up the http and websocket servers")
     let app = express();
 
     app.get('/stream', (req, res) => {
@@ -263,7 +263,7 @@ let startUp = function (callback) {
     let primus = Primus.createServer({
         port: configuration.get('ws_port'),
         transformer: 'websockets',
-        timeout:false
+        timeout: false
     });
 
 
@@ -289,4 +289,4 @@ let startUp = function (callback) {
 
 async.series([parseCommandLine, createStreams, startUp], () => {
     debug('TripleWave ready');
-});
+})
