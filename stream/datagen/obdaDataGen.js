@@ -9,7 +9,7 @@ const debug = require('debug')('obdaDataGen')
 
 //var query = fs.readFileSync(path.resolve(__dirname, '../../', configuration.get('rdf_query_folder'), 'getGraphContent.q')).toString();
 
-class obdaDataGen extends stream.Readable {
+class OBDADataGen extends stream.Readable {
     constructor(options) {
         super(options);
 
@@ -117,4 +117,4 @@ class obdaDataGen extends stream.Readable {
     }
 }
 
-module.exports = obdaDataGen
+module.exports = OBDADataGen
