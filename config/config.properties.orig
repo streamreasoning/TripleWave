@@ -23,9 +23,13 @@ tbox_stream_location=http://purl.oclc.org/NET/ssnx/ssn
 # transform: transform a web stream in rdf
 # replay: streamify a rdf dataset retrieved from a sparql endpoint
 # endless: similar to the replay, it substitute the original timestamps with the current (need better explaination)
+<<<<<<< HEAD
+mode=replay
+=======
 # endless_profiled: the triples are returned with a custom delay defined by a profield function
 mode=endless_profiled
 profiling_function=linearFunction
+>>>>>>> 6e5157ec6d886fce377d0d3bbc93da7070a95ba3
 
 ##############################################################################
 ############################## mode = transform ##############################
