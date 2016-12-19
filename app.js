@@ -32,6 +32,15 @@ let parseCommandLine = function (callback) {
     return callback();
 };
 
+let configureScheduler = function (options) {
+
+    var Scheduler = require('./stream/scheduler/rdfStreamScheduler')
+    options.profilingFunction = require('./stream/scheduler/profilingFunctions/' + configuration.get('profiling_function'));
+    options.min = configuration.get('minDelay');
+
+    return new Scheduler(options)
+};
+
 let createStreams = function (callback) {
 
     if (configuration.get('mode') !== 'transform') {
@@ -40,12 +49,11 @@ let createStreams = function (callback) {
 
             let buildStream = function () {
 
-                cache = new Cache(
-                    {
-                        objectMode: true,
-                        limit: 100,
-                        configuration: configuration
-                    });
+                cache = new Cache({
+                    objectMode: true,
+                    limit: 100,
+                    configuration: configuration
+                });
 
 
                 let options = {
@@ -54,22 +62,13 @@ let createStreams = function (callback) {
                     configuration: configuration
                 }
 
-
                 var DataGen = require('./stream/datagen/rdfStreamDataGen');
-                var Scheduler;
-
-                if (configuration.get('mode') === 'endless_profiled') {
-                    Scheduler = require('./stream/scheduler/profilerScheduler')
-                    options.profilingFunction = require('./stream/scheduler/profilingFunctions/' + configuration.get('profiling_function'));
-                    options.min = 10;
-                } else {
-                    Scheduler = require('./stream/scheduler/rdfStreamScheduler');
-                }
 
                 var IdReplacer = require('./stream/idReplacer');
 
                 var datagen = new DataGen(options);
-                var scheduler = new Scheduler(options);
+
+                var scheduler = configureScheduler(options);
 
                 var idReplacer = new IdReplacer(options);
 
@@ -88,8 +87,6 @@ let createStreams = function (callback) {
                         debug('Restarted');
                     });
                 }
-
-
                 toUse.pipe(cache);
 
 
@@ -104,13 +101,11 @@ let createStreams = function (callback) {
 
             let buildStream = function (restart) {
 
-                cache = new Cache(
-                    {
-                        objectMode: true,
-                        limit: 100,
-                        configuration: configuration
-                    }
-                );
+                cache = new Cache({
+                    objectMode: true,
+                    limit: 100,
+                    configuration: configuration
+                });
 
                 let options = {
                     objectMode: true,
@@ -118,18 +113,8 @@ let createStreams = function (callback) {
                     configuration: configuration
                 }
 
-                var Scheduler;
-
-                if (configuration.get('mode') === 'endless_profiled') {
-                    Scheduler = require('./stream/scheduler/profilerScheduler')
-                    options.profilingFunction = require('./stream/scheduler/profilingFunctions/' + configuration.get('profiling_function'));
-                    options.min = 10;
-                } else {
-                    Scheduler = require('./stream/scheduler/rdfStreamScheduler');
-                }
-
                 var datagen = new DataGen(options);
-                var scheduler = new Scheduler(options);
+                var scheduler = configureScheduler(options);
 
                 if (!restart) {
                     return datagen.loadData(() => {
@@ -166,13 +151,11 @@ let createStreams = function (callback) {
         }
     } else if (configuration.get('mode') === 'transform') {
 
-        cache = new Cache(
-            {
-                objectMode: true,
-                limit: 100,
-                configuration: configuration
-            }
-        );
+        cache = new Cache({
+            objectMode: true,
+            limit: 100,
+            configuration: configuration
+        });
 
         let stream = path.resolve(configuration.get('transform_folder'), configuration.get('transform_transformer'));
         debug('Loading stream %s', stream);
