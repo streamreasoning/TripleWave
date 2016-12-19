@@ -17,8 +17,13 @@ class RdfStreamScheduler extends stream.Transform {
         if (this.previousRealDate == null) {
             this.previousDataDate = moment(data['http://www.w3.org/ns/prov#generatedAtTime']);
             this.previousRealDate = moment();
+          
+            data.modifiedTimestamp = moment().format("YYYY-MM-DDTHH:mm:ss.SSSZZ");
+          
             this.push(data);
+          
             console.log("I am forwarding \n\t", data);
+          
             return cb();
         } else {
             var currentDataDate = moment(data['http://www.w3.org/ns/prov#generatedAtTime']);
@@ -51,6 +56,8 @@ class RdfStreamScheduler extends stream.Transform {
                         //          debug("I am forwarding \n\t", data);
                     this.previousRealDate = currentRealDate;
                     this.previousDataDate = currentDataDate;
+                    
+                    data.modifiedTimestamp = moment().format("YYYY-MM-DDTHH:mm:ss.SSSZZ");
                     this.push(data);
                     return cb();
                 }, sleepTime);

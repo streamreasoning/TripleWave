@@ -5,9 +5,9 @@ var profilingFunction = function(data,previousTimestamp,min,iteration){
     let time = 10000-iteration;
 
     if(time<min){
-
-        return min;
+        time=min;
     }
+    
     return time;
 }
 
