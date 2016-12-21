@@ -78,16 +78,18 @@ Cache.prototype.getAll = function() {
     }
   };
 
-
+  //DEPRECATED: this line should be dismissed, since SLD is replaced by RSD
   cache['sld:streamEndpoint']=[];
   cache['dcat:distribution']=[];
   if(this.configuration.get('ws_enabled')){
     //DEPRECATED: this line should be dismissed, since more endpoints are now possible
     cache['sld:streamLocation'] = this.configuration.get('ws_address');
+    //DEPRECATED: this line should be dismissed, since SLD is replaced by RSD
     cache['sld:streamEndpoint'].push({'rdf:type':{'@id':'sld:WebSocketStreamEndpoint'},'@id':this.configuration.get('ws_address')});
     cache['dcat:distribution'].push({'@id':this.configuration.get('ws_address'),'rsd:protocol':'ws','dcat:accessURL':this.configuration.get("ws_address")});
   }
   if(this.configuration.get('mqtt_enabled')){
+    //DEPRECATED: this line should be dismissed, since SLD is replaced by RSD
     cache['sld:streamEndpoint'].push({'rdf:type':{'@id':'sld:MQTTStreamEndpoint'},'@id':'mqtt://' + this.configuration.get('mqtt_broker_address') + ':' + this.configuration.get('mqtt_broker_port'),'sld:mqttTopic':this.configuration.get('mqtt_topic')});
     cache['dcat:distribution'].push({
 	'@id':'mqtt://'+this.configuration.get('mqtt_broker_address')+':'+this.configuration.get('mqtt_broker_port'),
