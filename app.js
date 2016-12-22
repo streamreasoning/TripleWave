@@ -301,7 +301,7 @@ let startUp = function (callback) {
         });
     } else {
         app.listen(configuration.get('port'), () => {
-           debug('HTTP and WebSocket servers ready');
+           debug('HTTP server ready');
            return callback();
         });
     }
