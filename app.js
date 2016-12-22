@@ -264,10 +264,13 @@ let startUp = function (callback) {
 
     let server = require('http').createServer(app)
 
+    let ws_path = (configuration.get('path') || '') + configuration.get('ws_stream_location');
+
     let primus = Primus.createServer({
         port: configuration.get('ws_port'),
         transformer: 'websockets',
-        timeout:false
+        timeout:false,
+        pathname: ws_path
     });
 
 
