@@ -49,7 +49,8 @@ let createStreams = function (callback) {
                 );
 
                 var DataGen = require('./stream/datagen/rdfStreamDataGen');
-                var Scheduler = require('./stream/scheduler/rdfStreamScheduler');
+                //var Scheduler = require('./stream/scheduler/rdfStreamScheduler');
+                var Scheduler = require('./stream/scheduler/streamScaler');
                 var IdReplacer = require('./stream/idReplacer');
 
                 var datagen = new DataGen({
@@ -60,7 +61,8 @@ let createStreams = function (callback) {
                 var scheduler = new Scheduler({
                     objectMode: true,
                     highWaterMark: 1,
-                    configuration: configuration
+                    configuration: configuration,
+                    scale:10
                 });
 
                 var idReplacer = new IdReplacer({
@@ -227,7 +229,8 @@ let startUp = function (callback) {
     // starting up the http and websocket servers 
     let app = express();
 
-    app.get('/stream', (req, res) => {
+    let path = configuration.get('path');
+    app.get(path+'/stream', (req, res) => {
 
         toUse
             .pipe(JSONStream.stringify())
@@ -239,15 +242,15 @@ let startUp = function (callback) {
         })
     });
 
-    app.get('/', function(req, res) {
+    app.get(path+'/', function(req, res) {
         return res.json(cache.getAll());
     });
 
-    app.get('/sgraph', function (req, res) {
+    app.get(path+'/sgraph', function (req, res) {
         return res.json(cache.getAll());
     });
 
-    app.get('/:id', function (req, res) {
+    app.get(path+'/:id', function (req, res) {
         debug('Searching element with id ' + req.params.id);
 
         var element = cache.find(req.params.id);
@@ -279,7 +282,8 @@ let startUp = function (callback) {
 
         let primus = Primus.createServer({
             port: configuration.get('ws_port'),
-            transformer: 'websockets'
+            transformer: 'websockets',
+	    timeout:false
         });
 
 
