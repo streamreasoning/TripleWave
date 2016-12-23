@@ -280,13 +280,15 @@ let startUp = function (callback) {
     if(configuration.get('ws_enabled')){
         debug('WS is enabled, setting up the server');
 
+	let ws_path = (configuration.get('path') || '') + configuration.get('ws_stream_location');
         let primus = Primus.createServer({
             port: configuration.get('ws_port'),
             transformer: 'websockets',
-	    timeout:false
+	    timeout:false,
+	    pathname: ws_path
         });
 
-
+	
         primus.on('initialised', () => {
             primus.on('connection', (spark) => {
                 debug("Someone connected and I'm starting to provide him data");
