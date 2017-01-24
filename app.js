@@ -3,19 +3,21 @@ const stream = require('stream');
 const path = require('path');
 const debug = require('debug')('TripleWave')
 const express = require('express');
+const favicon = require('serve-favicon');
 const async = require('async');
 const JSONStream = require('JSONStream')
 const program = require('commander');
 
 const Cache = require('./stream/cache');
 const Enricher = require('./stream/enricher');
-var configuration;
+const Queue = require('./stream/queue');
+let configuration;
 
 // TODO: rifarlo con le promise
 let cache = null;
 let toUse = null;
 
-let parseCommandLine = function (callback) {
+let parseCommandLine = function () {
     program
         .option('-m, --mode [mode]', 'TripleWave running mode', /^(transform|endless|replay|endless_profiled)$/i)
         .option('-c, --configuration [configuration]', 'Path to the configuration file')
@@ -29,7 +31,6 @@ let parseCommandLine = function (callback) {
 
     debug(configuration.get('mode'));
     debug(configuration.get('sources'));
-    return callback();
 };
 
 let configureScheduler = function (options) {
@@ -43,17 +44,23 @@ let configureScheduler = function (options) {
 
 let createStreams = function (callback) {
 
+    cache = new Cache({
+        objectMode: true,
+        limit: 100,
+        configuration: configuration
+    });
+
+    let queue = new Queue({
+        objectMode: true,
+        configuration: configuration
+    })
+
     if (configuration.get('mode') !== 'transform') {
 
         if (configuration.get('sources') === 'rdfstream') {
 
             let buildStream = function () {
 
-                cache = new Cache({
-                    objectMode: true,
-                    limit: 100,
-                    configuration: configuration
-                });
 
 
                 let options = {
@@ -73,7 +80,9 @@ let createStreams = function (callback) {
                 var idReplacer = new IdReplacer(options);
 
                 //compose the stream
-                toUse = datagen.pipe(scheduler);
+
+                toUse = datagen.pipe(queue);
+                toUse = toUse.pipe(scheduler);
                 toUse = toUse.pipe(idReplacer);
                 if (configuration.get("mode") == 'endless' || configuration.get("mode") == 'endless_profiled') {
                     var Replacer = require('./stream/currentTimestampReplacer');
@@ -100,12 +109,6 @@ let createStreams = function (callback) {
             debug('Using %s source', configuration.get('sources'));
 
             let buildStream = function (restart) {
-
-                cache = new Cache({
-                    objectMode: true,
-                    limit: 100,
-                    configuration: configuration
-                });
 
                 let options = {
                     objectMode: true,
@@ -135,7 +138,8 @@ let createStreams = function (callback) {
                 } else {
 
                     // Don't check if TW is in endless mode since this branch is only executed in endless mode
-                    toUse = datagen.pipe(scheduler);
+                    toUse = datagen.pipe(queue);
+                    toUse = toUse.pipe(scheduler);
                     var Replacer = require('./stream/currentTimestampReplacer');
                     toUse = toUse.pipe(new Replacer(options));
                     toUse.pipe(cache);
@@ -150,12 +154,6 @@ let createStreams = function (callback) {
             return buildStream(false);
         }
     } else if (configuration.get('mode') === 'transform') {
-
-        cache = new Cache({
-            objectMode: true,
-            limit: 100,
-            configuration: configuration
-        });
 
         let stream = path.resolve(configuration.get('transform_folder'), configuration.get('transform_transformer'));
         debug('Loading stream %s', stream);
@@ -176,7 +174,9 @@ let createStreams = function (callback) {
             configuration: configuration
         });
 
-        toUse = activeStream.pipe(enricher);
+
+        toUse = activeStream.pipe(queue);
+        toUse = toUse.pipe(enricher);
         toUse = toUse.pipe(idReplacer);
         toUse.pipe(cache);
 
@@ -208,6 +208,32 @@ let startUp = function (callback) {
     debug("starting up the http and websocket servers")
     let app = express();
 
+
+    let checkTripleWaveStarted = function (req, res, next) {
+        debug('Checking if TripleWave started streaming')
+        if (toUse) {
+            return next();
+        }
+
+        return res.status(400).json({
+            msg: 'Stream not started, please call the /start endpoint'
+        });
+    }
+
+
+    app.use(favicon(__dirname + '/public/favicon.ico'));
+    app.use(/\/(?!start\b)\b\w+/, checkTripleWaveStarted);
+
+    app.get('/start', (req, res) => {
+        if (!toUse) {
+            createStreams(() => {
+                return res.json({
+                    msg: "streamCreated"
+                })
+            });
+        }
+    })
+
     app.get('/stream', (req, res) => {
 
         toUse
@@ -218,6 +244,8 @@ let startUp = function (callback) {
             debug('Closing the HTTP chunk stream');
             toUse.unpipe(res);
         })
+
+
     });
 
     app.get('/sgraph', function (req, res) {
@@ -270,6 +298,18 @@ let startUp = function (callback) {
 
 };
 
-async.series([parseCommandLine, createStreams, startUp], () => {
+
+// startUp
+parseCommandLine();
+
+let delayed = configuration.get('delayed') || false;
+
+let actions = [createStreams, startUp];
+
+if (delayed) {
+    actions.shift();
+}
+
+async.series(actions, () => {
     debug('TripleWave ready');
 })
