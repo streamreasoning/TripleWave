@@ -5,7 +5,7 @@ var SparqlClient = require('sparql-client-2');
 var stream = require('stream');
 var $rdf = require('rdflib');
 const async = require('async');
-const debug = require('debug')('obdaDataGen')
+const debug = require('debug')('tw:obdaDataGen')
 
 //var query = fs.readFileSync(path.resolve(__dirname, '../../', configuration.get('rdf_query_folder'), 'getGraphContent.q')).toString();
 
@@ -22,6 +22,7 @@ class OBDADataGen extends stream.Readable {
     }
 
     retrieveIndices() {
+        debug("Loading observations")
         let indQuery = fs.readFileSync(path.resolve(__dirname, '../../', this.configuration.get('rdf_query_folder'), 'obs.q')).toString();
         debug(indQuery);
         this.client
@@ -59,15 +60,13 @@ class OBDADataGen extends stream.Readable {
 
         var b = this.bindings.pop();
 
-
         if (!b)
             return this.push(null);
 
         var obs = b.o.value;
         var ts= b.time.value;
 
-        debug(obs)
-        debug(ts)
+        debug("Observations Ids:\n\t",obs)
 
         query = query.split('$observation').join("<"+obs+">");
 
@@ -99,16 +98,12 @@ class OBDADataGen extends stream.Readable {
                     "@id": obs,
                     "@graph": JSON.parse(json)
                 };
-                debug(JSON.stringify(element));
-                debug('adding new element');
+                debug("Observation:\n\t", JSON.stringify(element));
                 const shouldContinue = this.push(element);
-                debug(shouldContinue)
 
                 if (shouldContinue) {
                 //  this.sendNext();
-                }
-
-                })})
+                }})})
             
             
 
