@@ -7,7 +7,7 @@
     "JSONStream": "^1.1.4",
     "active-x-obfuscator": "0.0.2",
     "async": "^2.0.0-rc.3",
-    "body-parser": "^1.13.1",
+    "body-parser": "^1.16.1",
     "debug": "^2.2.0",
     "errorhandler": "^1.4.0",
     "express": "^4.13.0",

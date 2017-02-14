@@ -221,7 +221,12 @@ class SparqlDataGen extends stream.Readable {
 
     sendNext() {
         
-        var query = fs.readFileSync(path.resolve(__dirname, '../../', this.configuration.get('rdf_query_folder'), 'getGraphContent.q')).toString();
+        var query;
+        if(configuratiion.get('rdf_guery_get_content')){
+            query = configuratiion.get('rdf_guery_get_content')
+        }else{
+            query = fs.readFileSync(path.resolve(__dirname, '../../', this.configuration.get('rdf_query_folder'), 'getGraphContent.q')).toString();
+        }
 
         var b = this.bindings.pop();
         if (!b)
@@ -253,10 +258,6 @@ class SparqlDataGen extends stream.Readable {
             debug('adding new element');
             const shouldContinue = this.push(element);
             debug(shouldContinue)
-
-            if (shouldContinue) {
-                //                this.sendNext();
-            }
         });
     }
 }
