@@ -1,6 +1,6 @@
 var stream = require('stream')
 var moment = require('moment')
-const debug = require('debug')('IdReplacer')
+const debug = require('debug')('tw:IdReplacer')
 
 class IdReplacer extends stream.Transform {
     constructor(options) {
@@ -20,6 +20,7 @@ class IdReplacer extends stream.Transform {
 
             let dataId = 'http://' + (configuration.get('externalAddress') || (configuration.get('hostname') + ':' + configuration.get('port'))) + '/' + id;
 
+            debug("I am replacing the ID\n")
             return dataId;
         }
 

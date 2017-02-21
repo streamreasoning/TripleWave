@@ -56,10 +56,10 @@ if [ -z "${log}" ]; then
   fi
 else
   if [ -z "${debug}" ]; then
-    DEBUG=* node app.js --fuseki=$! --mode="$mode" --configuration="$configuration" --sources="$sources"
+    DEBUG=tw:* node app.js --fuseki=$! --mode="$mode" --configuration="$configuration" --sources="$sources"
   else
     echo "Starting in debug mode"
-    DEBUG=* node debug app.js --fuseki=$! --mode="$mode" --configuration="$configuration" --sources="$sources"
+    DEBUG=tw:* node debug app.js --fuseki=$! --mode="$mode" --configuration="$configuration" --sources="$sources"
   fi
 fi
 

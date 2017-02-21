@@ -1,7 +1,7 @@
 const Primus = require('primus');
 const stream = require('stream');
 const path = require('path');
-const debug = require('debug')('TripleWave')
+const debug = require('debug')('tw:App')
 const express = require('express');
 const favicon = require('serve-favicon');
 const bodyParser = require('body-parser')
@@ -20,6 +20,7 @@ let cache = null;
 let toUse = null;
 
 let parseCommandLine = function () {
+    debug("parseCommandLine\n")
     program
         .option('-m, --mode [mode]', 'TripleWave running mode', /^(transform|endless|replay|endless_profiled)$/i)
         .option('-c, --configuration [configuration]', 'Path to the configuration file')
@@ -31,8 +32,6 @@ let parseCommandLine = function () {
     program.mode ? configuration.set('mode', program.mode) : null;
     program.sources ? configuration.set('sources', program.sources) : null;
 
-    debug(configuration.get('mode'));
-    debug(configuration.get('sources'));
 };
 
 let configureScheduler = function (options) {
@@ -58,13 +57,12 @@ let createStreams = function (callback) {
     })
 
     if (configuration.get('mode') !== 'transform') {
+        debug("Config Mode \s\n", configuration.get('mode'))
 
         if (configuration.get('sources') === 'rdfstream') {
 
             let buildStream = function () {
-
-
-
+            
                 let options = {
                     objectMode: true,
                     highWaterMark: 1,
@@ -154,6 +152,45 @@ let createStreams = function (callback) {
             }
 
             return buildStream(false);
+        } else if (configuration.get('sources') === 'stream'){
+            debug("Selected Stream Source")
+            let buildStream = function () {
+
+                var DataGen = require('./stream/datagen/obdaDataGen');
+                var Scheduler = require('./stream/scheduler/rdfStreamScheduler');
+                var Scheduler = require('./stream/scheduler/streamScaler');
+                var IdReplacer = require('./stream/idReplacer');
+
+                var datagen = new DataGen({
+                    objectMode: true,
+                    highWaterMark: 1,
+                    configuration: configuration
+                });
+                
+                var scheduler = new Scheduler({
+                    objectMode: true,
+                    highWaterMark: 1,
+                    configuration: configuration,
+                    scale: 10
+                });
+
+                var idReplacer = new IdReplacer({
+                    objectMode: true,
+                    configuration: configuration
+                });
+
+                //compose the stream
+                toUse = datagen.pipe(scheduler);
+                toUse = toUse.pipe(idReplacer);
+
+                toUse.pipe(cache);
+
+
+            };
+
+            buildStream();
+
+            return callback();
         }
     } else if (configuration.get('mode') === 'transform') {
 
@@ -183,7 +220,7 @@ let createStreams = function (callback) {
         toUse.pipe(cache);
 
         return callback();
-    }
+    } 
 
     if (!toUse) {
         debug('Using dummy data');
@@ -207,9 +244,8 @@ let createStreams = function (callback) {
 
 let startUp = function (callback) {
 
-    debug("starting up the http and websocket servers")
+    debug("Starting up the HTTP Server");
     let app = express();
-
 
     let checkTripleWaveStarted = function (req, res, next) {
         debug('Checking if TripleWave started streaming')
@@ -241,7 +277,8 @@ let startUp = function (callback) {
 
     })
 
-    app.post('/start', (req, res) => {
+    debug("Set up /start API")
+    app.get('/start', (req, res) => {
         if (!toUse) {
             createStreams(() => {
                 return res.json({
@@ -251,6 +288,7 @@ let startUp = function (callback) {
         }
     })
 
+    debug("Set up /stream API")
     app.get('/stream', (req, res) => {
 
         toUse
@@ -265,10 +303,12 @@ let startUp = function (callback) {
 
     });
 
+    debug("Set up /sgraph API")
     app.get('/sgraph', function (req, res) {
         return res.json(cache.getAll());
     });
 
+    debug("Set up /:id API")
     app.get('/:id', function (req, res) {
         debug('Searching element with id ' + req.params.id);
 
@@ -285,8 +325,10 @@ let startUp = function (callback) {
             });
         }
     });
-
+    
     let server = require('http').createServer(app)
+
+    debug("Initializing Primus")
 
     let primus = Primus.createServer({
         port: configuration.get('ws_port'),
@@ -294,8 +336,8 @@ let startUp = function (callback) {
         timeout: false
     });
 
-
     primus.on('initialised', () => {
+        
         primus.on('connection', (spark) => {
             debug("Someone connected and I'm starting to provide him data");
             toUse.pipe(spark);
@@ -311,22 +353,19 @@ let startUp = function (callback) {
             return callback();
         })
     });
-
-
 };
 
-
-// startUp
 parseCommandLine();
 
+let actions = [createStreams, startUp];
 let delayed = configuration.get('delayed') || false;
 
-let actions = [createStreams, startUp];
-
 if (delayed) {
-    actions.shift();
-}
+        debug('TripleWave is waiting for start');
+        actions.shift();
+        //TODO primus payload here?
+    } 
 
 async.series(actions, () => {
-    debug('TripleWave ready');
+    debug('TripleWave ready');      
 })

@@ -1,6 +1,6 @@
 var stream = require('stream')
 var moment = require('moment')
-const debug = require('debug')('StreamScaler')
+const debug = require('debug')('tw:StreamScaler')
 
 class StreamScaler extends stream.Transform {
     constructor(options) {
