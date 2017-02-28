@@ -249,11 +249,16 @@ class SparqlDataGen extends stream.Readable {
         };
 
         request.post(options, (error, response, body) => {
+
+             var jsonts = { "@value": ts,
+                               "@type": "http://www.w3.org/2001/XMLSchema#dateTime" }
+
             var element = {
-                "http://www.w3.org/ns/prov#generatedAtTime": ts,
-                "@id": graph,
-                "@graph": JSON.parse(body)
+                    "http://www.w3.org/ns/prov#generatedAtTime": jsonts,
+                    "@id": graph,
+                    "@graph": JSON.parse(body)
             };
+   
             debug(JSON.stringify(element));
             debug('adding new element');
             const shouldContinue = this.push(element);

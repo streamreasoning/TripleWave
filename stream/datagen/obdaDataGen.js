@@ -93,11 +93,16 @@ class OBDADataGen extends stream.Readable {
 
                 $rdf.serialize(undefined, kb, undefined, 'application/ld+json', (error, json) => {
                 debug (json)
+
+                var jsonts = { "@value": ts,
+                               "@type": "http://www.w3.org/2001/XMLSchema#dateTime" }
+
                 var element = {
-                    "http://www.w3.org/ns/prov#generatedAtTime": ts,
+                    "http://www.w3.org/ns/prov#generatedAtTime": jsonts,
                     "@id": obs,
                     "@graph": JSON.parse(json)
                 };
+   
                 debug("Observation:\n\t", JSON.stringify(element));
                 const shouldContinue = this.push(element);
 
