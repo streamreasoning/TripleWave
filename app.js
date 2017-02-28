@@ -249,7 +249,6 @@ let startUp = function (callback) {
 
     let checkTripleWaveStarted = function (req, res, next) {
         debug('Checking if TripleWave started streaming')
-        console.log(req)
         if (toUse || req.originalUrl==='/register') {
             return next();
         }
@@ -266,7 +265,8 @@ let startUp = function (callback) {
     app.post('/register',(req,res)=>{
         let body = req.body;
 
-        console.log(body)
+        debug(body)
+
         body.rdf_stream_item_content_pattern ? configuration.set('rdf_stream_item_content_pattern', body.rdf_stream_item_content_pattern) : null;
         body.rdf_query_endpoint ? configuration.set('rdf_query_endpoint', body.rdf_query_endpoint) : null;
         body.rdf_guery_get_content ? configuration.set('rdf_guery_get_content', body.rdf_guery_get_content) : null;
