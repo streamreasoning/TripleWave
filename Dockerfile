@@ -1,8 +1,10 @@
 FROM node:6.9.1
 
-RUN git clone -b rsplab https://github.com/streamreasoning/TripleWave.git triplewave
+#RUN git clone -b rsplab https://github.com/streamreasoning/TripleWave.git triplewave
 
-WORKDIR triplewave/
+COPY src/ /opt/tw
 
-RUN npm install
+WORKDIR /opt/tw 
+
+RUN  ls &&npm install
 RUN rm -rf config/*
