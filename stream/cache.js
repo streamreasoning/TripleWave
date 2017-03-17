@@ -5,6 +5,7 @@ var Transform = stream.Transform || require('readable-stream').Transform;
 var PropertiesReader = require('properties-reader');
 var path = require('path');
 var debug = require('debug')('Cache');
+var fs = require('fs');
 
 
 function Cache(options) {
@@ -61,19 +62,23 @@ Cache.prototype.getAll = function() {
 
   var array = _.clone(this.array);
 
-  var cache = {
-    "@context": {
-      "sld": "http://streamreasoning.org/ontologies/SLD4TripleWave#",
-      "generatedAt": {
-        "@id": "http://www.w3.org/ns/prov#generatedAtTime",
-        "@type": "http://www.w3.org/2001/XMLSchema#dateTime"
-      }
-    },
-    "@id": "tr:sGraph",
-    "sld:contains": {
-      "@list": []
-    }
-  };
+  debug(this.configuration.sgraph)
+  var body = fs.readFileSync(path.resolve(__dirname,'../', 'rdf', this.configuration.get('sgraph'))).toString();
+
+  cache = JSON.parse(body)
+  // var cache = {
+  //   "@context": {
+  //     "sld": "http://streamreasoning.org/ontologies/SLD4TripleWave#",
+  //     "generatedAt": {
+  //       "@id": "http://www.w3.org/ns/prov#generatedAtTime",
+  //       "@type": "http://www.w3.org/2001/XMLSchema#dateTime"
+  //     }
+  //   },
+  //   "@id": "tr:sGraph",
+  //   "sld:contains": {
+  //     "@list": []
+  //   }
+  // };
 
   cache['sld:streamLocation'] = this.configuration.get('ws_address');
   cache['sld:tBoxLocation'] = {

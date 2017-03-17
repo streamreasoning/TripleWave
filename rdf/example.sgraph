@@ -1,0 +1,11 @@
+{ "@context": {
+      "sld": "http://streamreasoning.org/ontologies/SLD4TripleWave#",
+      "generatedAt": {
+        "@id": "http://www.w3.org/ns/prov#generatedAtTime",
+        "@type": "http://www.w3.org/2001/XMLSchema#dateTime"
+      }
+    },
+    "@id": "tr:sGraph",
+    "sld:contains": {
+      "@list": []
+    }}
