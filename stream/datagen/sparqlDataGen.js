@@ -18,6 +18,7 @@ class SparqlDataGen extends stream.Readable {
         this.remote = options.configuration.get('rdf_remote');
         this.client = new SparqlClient(this.endpoint);
         this.bindings = null;
+
     }
 
     loadData(callback) {
@@ -222,9 +223,9 @@ class SparqlDataGen extends stream.Readable {
     sendNext() {
         
         var query;
-        if(configuratiion.get('rdf_guery_get_content')){
-            query = configuratiion.get('rdf_guery_get_content')
-        }else{
+        if(this.configuration.get('rdf_guery_get_content')){
+            query = this.configuration.get('rdf_guery_get_content')
+        } else{
             query = fs.readFileSync(path.resolve(__dirname, '../../', this.configuration.get('rdf_query_folder'), 'getGraphContent.q')).toString();
         }
 

@@ -57,7 +57,7 @@ let createStreams = function (callback) {
     })
 
     if (configuration.get('mode') !== 'transform') {
-        debug("Config Mode \s\n", configuration.get('mode'))
+        debug("Config Mode %s\n", configuration.get('mode'))
 
         if (configuration.get('sources') === 'rdfstream') {
 
@@ -269,10 +269,11 @@ let startUp = function (callback) {
 
         body.rdf_stream_item_content_pattern ? configuration.set('rdf_stream_item_content_pattern', body.rdf_stream_item_content_pattern) : null;
         body.rdf_query_endpoint ? configuration.set('rdf_query_endpoint', body.rdf_query_endpoint) : null;
+        body.rdf_update_endpoint ? configuration.set('rdf_update_endpoint', body.rdf_update_endpoint) : null;
         body.rdf_guery_get_content ? configuration.set('rdf_guery_get_content', body.rdf_guery_get_content) : null;
 
         res.json({
-            msg:'stream registered'
+            msg: configuration
         })
 
     })
