@@ -13,11 +13,15 @@ const program = require('commander');
 const Cache = require('./stream/cache');
 const Enricher = require('./stream/enricher');
 const Queue = require('./stream/queue');
+const Bottleneck = require("./stream/datagen/bottleneck");
+const FakeDataGen = require('./stream/datagen/fakeDataGen');
 let configuration;
 
 // TODO: rifarlo con le promise
 let cache = null;
 let toUse = null;
+let bottleneck = new Bottleneck({ objectMode: true,    configuration: configuration });
+let fakeDataGen = null;
 
 let parseCommandLine = function () {
     debug("parseCommandLine\n")
@@ -182,11 +186,18 @@ let createStreams = function (callback) {
                 });
 
                 //compose the stream
+                // toUse = datagen.pipe(scheduler);
+                // toUse = toUse.pipe(replacer);
+                // toUse = toUse.pipe(cache);
+                // fakeDataGen.unpipe(bottleneck);
+                // toUse.pipe(bottleneck);
+                fakeDataGen.unpipe(bottleneck);
                 toUse = datagen.pipe(scheduler);
                 toUse = toUse.pipe(replacer);
-                toUse.pipe(cache);
+                bottleneck = toUse.pipe(bottleneck);
+                bottleneck.pipe(cache);     
 
-
+                  
             };
 
             buildStream();
@@ -341,13 +352,19 @@ let startUp = function (callback) {
     primus.on('initialised', () => {
         
         primus.on('connection', (spark) => {
+            if(!toUse && !fakeDataGen){
+                fakeDataGen = new FakeDataGen({
+                        objectMode: true,
+                        configuration: configuration });
+                fakeDataGen.pipe(bottleneck);
+            }
             debug("Someone connected and I'm starting to provide him data");
-            toUse.pipe(spark);
+            bottleneck.pipe(spark)
         });
 
         primus.on('disconnection', (spark) => {
             debug("Someone disconnected and he doesn't deserve my data anymore");
-            toUse.unpipe(spark);
+            bottleneck.unpipe(spark);
         });
 
         app.listen(configuration.get('port'), () => {
@@ -365,6 +382,7 @@ let delayed = configuration.get('delayed') || false;
 if (delayed) {
         debug('TripleWave is waiting for start');
         actions.shift();
+      
         //TODO primus payload here?
     } 
 

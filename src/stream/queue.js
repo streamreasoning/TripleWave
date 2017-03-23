@@ -25,7 +25,7 @@ class Queue extends stream.Transform {
                 debug('Pushing %j ', element);
             }
         } else {
-            debug("Queueing data")
+            debug("Enqueuing data")
         }
 
         return cb();

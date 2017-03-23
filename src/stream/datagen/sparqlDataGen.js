@@ -258,7 +258,7 @@ class SparqlDataGen extends stream.Readable {
                                "@type": "http://www.w3.org/2001/XMLSchema#dateTime" }
 
             var element = {
-                    "http://www.w3.org/ns/prov#generatedAtTime": processingTimepro,
+                    "http://www.w3.org/ns/prov#generatedAtTime": processingTime,
                     "http://www.streamreasoning.org/vois#eventTime": eventTime,
                     "@id": graph,
                     "@graph": JSON.parse(body)
