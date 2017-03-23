@@ -191,7 +191,8 @@ let createStreams = function (callback) {
                 // toUse = toUse.pipe(cache);
                 // fakeDataGen.unpipe(bottleneck);
                 // toUse.pipe(bottleneck);
-                fakeDataGen.unpipe(bottleneck);
+                if(fakeDataGen)
+                    fakeDataGen.unpipe(bottleneck);
                 toUse = datagen.pipe(scheduler);
                 toUse = toUse.pipe(replacer);
                 bottleneck = toUse.pipe(bottleneck);
