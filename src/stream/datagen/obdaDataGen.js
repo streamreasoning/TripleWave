@@ -23,7 +23,7 @@ class OBDADataGen extends stream.Readable {
 
     retrieveIndices() {
         debug("Loading observations")
-        let indQuery = fs.readFileSync(path.resolve(__dirname, '../../', this.configuration.get('rdf_query_folder'), 'obs.q')).toString();
+        let indQuery = fs.readFileSync(path.resolve(__dirname, '../../', "rdf/stream", 'obs.q')).toString();
         debug(indQuery);
         this.client
             .query(indQuery)
@@ -56,7 +56,7 @@ class OBDADataGen extends stream.Readable {
 
     sendNext() {
         
-        var query = fs.readFileSync(path.resolve(__dirname, '../../', this.configuration.get('rdf_query_folder'), 'construct.tmpl')).toString();
+        var query = fs.readFileSync(path.resolve(__dirname, '../../', "rdf/stream", 'construct.tmpl')).toString();
 
         var b = this.bindings.pop();
 
@@ -70,7 +70,7 @@ class OBDADataGen extends stream.Readable {
 
         query = query.split('$observation').join("<"+obs+">");
 
-        //debug(query)
+        debug(query)
 
         var options = {
             url: this.configuration.get('rdf_query_endpoint'),
@@ -94,11 +94,37 @@ class OBDADataGen extends stream.Readable {
                 $rdf.serialize(undefined, kb, undefined, 'application/ld+json', (error, json) => {
                 debug (json)
 
-                var jsonts = { "@value": ts,
+                var processingTime = { "@value": ts,
+                               "@type": "http://www.w3.org/2001/XMLSchema#dateTime" }  
+
+                var eventTime = { "@value": ts,
                                "@type": "http://www.w3.org/2001/XMLSchema#dateTime" }
 
                 var element = {
-                    "http://www.w3.org/ns/prov#generatedAtTime": jsonts,
+                    "@context": {
+                        "ct":"http://www.insight-centre.org/citytraffic#",
+                        "dr":"http://www.insight-centre/DataRequest#",
+                        "ces":"http://www.insight-centre.org/ces#",
+                        "dul":"http://www.loa.istc.cnr.it/ontologies/DUL.owl#",
+                        "owl":"http://www.w3.org/2002/07/owl#",
+                        "rdf":"http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+                        "ses":"http://www.insight-centre.org/dataset/SampleEventService#",
+                        "ssn":"http://purl.oclc.org/NET/ssnx/ssn#",
+                        "xml":"http://www.w3.org/XML/1998/namespace",
+                        "xsd":"http://www.w3.org/2001/XMLSchema#",
+                        "prof":"http://www.daml.org/services/owl-s/1.2/Profile.owl#",
+                        "rdfs":"http://www.w3.org/2000/01/rdf-schema#",
+                        "service":"http://www.daml.org/services/owl-s/1.2/Service.owl#",
+                        "servicep":"http://www.daml.org/services/owl-s/1.2/ServiceParameter.owl#",
+                        "grounding": "http://www.daml.org/services/owl-s/1.2/Grounding.owl#",
+                        "sld": "http://streamreasoning.org/ontologies/SLD4TripleWave#",
+                          "generatedAt": {
+                            "@id": "http://www.w3.org/ns/prov#generatedAtTime",
+                            "@type": "http://www.w3.org/2001/XMLSchema#dateTime"
+                          }
+                    },
+                    "http://www.w3.org/ns/prov#generatedAtTime": processingTime,
+                    "http://www.streamreasoning.org/vois#eventTime": eventTime,
                     "@id": obs,
                     "@graph": JSON.parse(json)
                 };

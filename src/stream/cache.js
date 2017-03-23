@@ -81,9 +81,6 @@ Cache.prototype.getAll = function() {
   // };
 
   cache['sld:streamLocation'] = this.configuration.get('ws_address');
-  cache['sld:tBoxLocation'] = {
-    "@id": this.configuration.get('tbox_stream_location')
-  };
 
   for (var i = array.length - 1; i >= 0; i--) {
     var e = array[i];

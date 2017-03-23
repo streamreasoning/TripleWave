@@ -189,7 +189,7 @@ class SparqlDataGen extends stream.Readable {
 
 
     retrieveIndices() {
-        let indQuery = fs.readFileSync(path.resolve(__dirname, '../../', this.configuration.get('rdf_query_folder'), 'selectGraphsWithTs.q')).toString();
+        let indQuery = fs.readFileSync(path.resolve(__dirname, '../../', "rdf/triples", 'selectGraphsWithTs.q')).toString();
         debug(indQuery);
         this.client
             .query(indQuery)
@@ -226,7 +226,7 @@ class SparqlDataGen extends stream.Readable {
         if(this.configuration.get('rdf_guery_get_content')){
             query = this.configuration.get('rdf_guery_get_content')
         } else{
-            query = fs.readFileSync(path.resolve(__dirname, '../../', this.configuration.get('rdf_query_folder'), 'getGraphContent.q')).toString();
+            query = fs.readFileSync(path.resolve(__dirname, '../../', "rdf/triples", 'getGraphContent.q')).toString();
         }
 
         var b = this.bindings.pop();
@@ -251,11 +251,15 @@ class SparqlDataGen extends stream.Readable {
 
         request.post(options, (error, response, body) => {
 
-             var jsonts = { "@value": ts,
+            var processingTime = { "@value": ts,
+                               "@type": "http://www.w3.org/2001/XMLSchema#dateTime" }
+
+            var eventTime = { "@value": ts,
                                "@type": "http://www.w3.org/2001/XMLSchema#dateTime" }
 
             var element = {
-                    "http://www.w3.org/ns/prov#generatedAtTime": jsonts,
+                    "http://www.w3.org/ns/prov#generatedAtTime": processingTimepro,
+                    "http://www.streamreasoning.org/vois#eventTime": eventTime,
                     "@id": graph,
                     "@graph": JSON.parse(body)
             };

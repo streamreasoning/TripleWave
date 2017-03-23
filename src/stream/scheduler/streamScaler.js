@@ -12,12 +12,12 @@ class StreamScaler extends stream.Transform {
 
     _transform(data, enc, cb) {
         if (this.previousDataDate == null) {
-            this.previousDataDate = moment(data['http://www.w3.org/ns/prov#generatedAtTime']);
+            this.previousDataDate = moment(data['http://www.w3.org/ns/prov#generatedAtTime']['@value']);
             this.push(data);
             debug("I am forwarding \n\t", data);
             return cb();
         } else {
-            var currentDataDate = moment(data['http://www.w3.org/ns/prov#generatedAtTime']);
+            var currentDataDate = moment(data['http://www.w3.org/ns/prov#generatedAtTime']['@value']);
             var deltaDataDate = currentDataDate.diff(this.previousDataDate, 'milliseconds')
             debug('deltaDataDate: ', deltaDataDate, '(', currentDataDate.format('x'), '-', this.previousDataDate.format('x'), ')')
             if (deltaDataDate > 0) {

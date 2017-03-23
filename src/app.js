@@ -25,12 +25,12 @@ let parseCommandLine = function () {
         .option('-m, --mode [mode]', 'TripleWave running mode', /^(transform|endless|replay|endless_profiled)$/i)
         .option('-c, --configuration [configuration]', 'Path to the configuration file')
         .option('-s, --sources [sources]', 'Source of the data')
-        .option('--fuseki [fuseki]', 'Fuseki PID')
         .parse(process.argv);
 
     configuration = require('./configuration')(program.configuration);
     program.mode ? configuration.set('mode', program.mode) : null;
     program.sources ? configuration.set('sources', program.sources) : null;
+    debug(configuration)
 
 };
 
@@ -159,8 +159,9 @@ let createStreams = function (callback) {
                 var DataGen = require('./stream/datagen/obdaDataGen');
                 var Scheduler = require('./stream/scheduler/rdfStreamScheduler');
                 var Scheduler = require('./stream/scheduler/streamScaler');
-                var IdReplacer = require('./stream/idReplacer');
-
+                //var IdReplacer = require('./stream/idReplacer');
+                var Replacer = require('./stream/currentTimestampReplacer');
+                
                 var datagen = new DataGen({
                     objectMode: true,
                     highWaterMark: 1,
@@ -171,18 +172,18 @@ let createStreams = function (callback) {
                     objectMode: true,
                     highWaterMark: 1,
                     configuration: configuration,
-                    scale: 10
+                    scale: configuration.get('scale_factor')
                 });
 
-                var idReplacer = new IdReplacer({
+                var replacer = new Replacer({
                     objectMode: true,
+                    highWaterMark: 1,
                     configuration: configuration
                 });
 
                 //compose the stream
                 toUse = datagen.pipe(scheduler);
-                toUse = toUse.pipe(idReplacer);
-
+                toUse = toUse.pipe(replacer);
                 toUse.pipe(cache);
 
 
