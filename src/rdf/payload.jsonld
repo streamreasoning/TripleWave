@@ -1,0 +1,6 @@
+{
+ "@context":"http://schema.org/",
+ "@id":"exampleID",
+ "@type":"Intangible",
+ "http://www.w3.org/ns/prov#generatedAtTime":"exampleTimestamp"
+}

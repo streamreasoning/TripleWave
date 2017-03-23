@@ -11,17 +11,15 @@ class FakeDataGen extends stream.PassThrough {
 
     constructor(options) {
         super(options);
-        setInterval((function() {
-                    var element = {
-                    "@context": "http://schema.org/",
-                    "@id": "http://streamreasoning.org/triplewave/"+options.configuration.get("stream_name")+"-"+uuid.v4(),
-                    "@type": "Intangible",
 
-                    "http://www.w3.org/ns/prov#generatedAtTime": moment().format("YYYY-MM-DDTHH:mm:ss.SSSZZ")  
-                    }
-                    
+        var name = options.configuration.get("stream_name");
+        var element = fs.readFileSync(path.resolve(__dirname,'../../', 'rdf', options.configuration.get('payload'))).toString();
+        element = JSON.parse(element)
+        setInterval((function() {
+                    element['@id'] = "http://streamreasoning.org/triplewave/"+name+"-"+uuid.v4();
+                    element['http://www.w3.org/ns/prov#generatedAtTime'] =  moment().format("YYYY-MM-DDTHH:mm:ss.SSSZZ");
                     this.push(element);
-                }).bind(this), 1000);
+        }).bind(this), 1000);
     }
 }
 
