@@ -31,7 +31,7 @@ class SparqlDataGen extends stream.Readable {
             //'LOAD <file:../rdf/data.ttl> INTO GRAPH <http://example/input>'
             //var query = 'LOAD <file:..' + _this.configuration.get('rdf_file') + '> INTO GRAPH <http://example/input>';
 
-            var query = fs.readFileSync(path.resolve(__dirname,'../../', 'rdf', 'loadFile.q')).toString();
+            var query = fs.readFileSync(path.resolve(__dirname,'../../', 'rdf/triples/local', 'loadFile.q')).toString();
 
             query = query.split('[file]').join(_this.configuration.get('rdf_file'));
 
@@ -66,7 +66,7 @@ class SparqlDataGen extends stream.Readable {
             var graphName = 'http://' + (_this.configuration.get('externaladdress') || (hostname + ':' + port + location));
 
 
-            var create = fs.readFileSync(path.resolve(__dirname,'../../', 'rdf', 'createGraph.q')).toString();
+            var create = fs.readFileSync(path.resolve(__dirname,'../../', 'rdf/sgraph', 'createGraph.q')).toString();
             create = create.split('[hostname]').join(graphName);
 
             debug(create);
@@ -124,7 +124,7 @@ class SparqlDataGen extends stream.Readable {
                 debug(triple);
                 //var insertQuery = fs.readFileSync('./rdf/insertNewTriple.q').toString();
                 var insertQueryPath = _this.configuration.get('rdf_insert_new_triple')
-                var insertQuery = fs.readFileSync(path.resolve(__dirname,'../',insertQueryPath)).toString();
+                var insertQuery = fs.readFileSync(path.resolve(__dirname,'../', "rdf", insertQueryPath)).toString();
 
                 var graph = triple.graph.value;
                 var key = triple.key.value;

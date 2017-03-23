@@ -63,7 +63,7 @@ Cache.prototype.getAll = function() {
   var array = _.clone(this.array);
 
   debug(this.configuration.sgraph)
-  var body = fs.readFileSync(path.resolve(__dirname,'../', 'rdf', this.configuration.get('sgraph'))).toString();
+  var body = fs.readFileSync(path.resolve(__dirname,'../', 'rdf/sgraph', this.configuration.get('sgraph'))).toString();
 
   cache = JSON.parse(body)
   // var cache = {
