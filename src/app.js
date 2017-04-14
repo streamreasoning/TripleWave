@@ -5,7 +5,7 @@ const debug = require('debug')('tw:App')
 const express = require('express');
 const favicon = require('serve-favicon');
 const bodyParser = require('body-parser')
-
+const fs = require('fs')
 const async = require('async');
 const JSONStream = require('JSONStream')
 const program = require('commander');
@@ -273,7 +273,7 @@ let startUp = function (callback) {
 
     app.use(bodyParser.json())
     app.use(favicon(__dirname + '/public/favicon.ico'));
-    app.use(/\/(?!start\b)\b\w+/, checkTripleWaveStarted);
+    //app.use(/\/(?!start\b)\b\w+/, checkTripleWaveStarted);
 
     app.post('/register',(req,res)=>{
         let body = req.body;
@@ -319,7 +319,14 @@ let startUp = function (callback) {
 
     debug("Set up /sgraph API")
     app.get('/sgraph', function (req, res) {
-        return res.json(cache.getAll());
+        if(cache){
+            return res.json(cache.getAll());
+        }else{
+            let sgraph = JSON.parse(fs.readFileSync(path.resolve(__dirname, 'rdf/sgraph', configuration.get('sgraph'))).toString());
+            sgraph['sld:streamLocation'] = configuration.get('ws_address');
+            return res.json(sgraph)
+        }
+        
     });
 
     debug("Set up /:id API")
