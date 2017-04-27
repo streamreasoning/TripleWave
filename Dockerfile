@@ -7,4 +7,3 @@ COPY src/ /opt/tw
 WORKDIR /opt/tw 
 
 RUN  ls &&npm install
-RUN rm -rf config/*
