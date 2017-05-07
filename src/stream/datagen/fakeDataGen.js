@@ -16,7 +16,7 @@ class FakeDataGen extends stream.PassThrough {
         var element = fs.readFileSync(path.resolve(__dirname,'../../', 'rdf', options.configuration.get('payload'))).toString();
         element = JSON.parse(element)
         setInterval((function() {
-                    element['@id'] = "http://streamreasoning.org/triplewave/"+name+"-"+uuid.v4();
+                    element['@id'] = "http://www.rsp-lab.org/triplewave/payload/"+name+"-"+uuid.v4();
                     element['http://www.w3.org/ns/prov#generatedAtTime'] =  moment().format("YYYY-MM-DDTHH:mm:ss.SSSZZ");
                     this.push(element);
         }).bind(this), 1000);
