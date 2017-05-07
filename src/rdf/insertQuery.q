@@ -1,6 +1,7 @@
 PREFIX afn: <http://jena.hpl.hp.com/ARQ/function#>
 PREFIX prov: <http://www.w3.org/ns/prov#> 
 PREFIX obs: <http://knoesis.wright.edu/ssw/ont/sensor-observation.owl#>
+prefix dc: <http://purl.org/dc/elements/1.1/>
 
 WITH <http://example.org/sgraph>
 INSERT{

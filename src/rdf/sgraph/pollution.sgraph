@@ -6,7 +6,7 @@
       }
     },
     "@id": "tr:sGraph",
-    "sld:tBoxLocation": "http://cbquest.westeurope.cloudapp.azure.com:8080/openrdf-sesame/repositories/CityBenchOnto",
+    "sld:tBoxLocation": "https://rsplab.blob.core.windows.net/static/citybench.owl",
     "sld:contains": {
       "@list": []
     }

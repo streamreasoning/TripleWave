@@ -5,7 +5,7 @@ INSERT{
 ?key ?p ?o
 }
 WHERE {
-  GRAPH <http://example/input>{
+  GRAPH <http://example/input> {
   ?key ?p ?o
  } 
 } 
