@@ -105,10 +105,9 @@ class OBDADataGen extends stream.Readable {
                 var eventTime = { "@value": ts,
                                "@type": "http://www.w3.org/2001/XMLSchema#dateTime" }
 
-                var id_new = 'http://' + (this.configuration.get('externaladdress') || (hostname + ':' + port + location));
-                new_id = id_new + obs.split(stream_name)[1]
+                var base = 'http://' + (this.configuration.get('externaladdress') || (hostname + ':' + port + location));
 
-                debug(new_id)
+                debug(base)
 
                 var element = {
                     "@context": {
@@ -135,7 +134,7 @@ class OBDADataGen extends stream.Readable {
                     },
                     "http://www.w3.org/ns/prov#generatedAtTime": processingTime,
                     "http://www.streamreasoning.org/sld#eventTime": eventTime,
-                    "@id": new_id,
+                    "@id": base + obs.split(stream_name)[1],
                     "@graph": JSON.parse(json)
                 };
    
