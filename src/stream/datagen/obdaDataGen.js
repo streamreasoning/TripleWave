@@ -91,6 +91,11 @@ class OBDADataGen extends stream.Readable {
                 
                 //debug(kb)
 
+                var hostname = _this.configuration.get('hostname');
+                var port = _this.configuration.get('port');
+                var location = _this.configuration.get('path')||'';
+                var stream_name = configuration.get('stream_name');
+
                 $rdf.serialize(undefined, kb, undefined, 'application/ld+json', (error, json) => {
                 debug (json)
 
@@ -99,6 +104,11 @@ class OBDADataGen extends stream.Readable {
 
                 var eventTime = { "@value": ts,
                                "@type": "http://www.w3.org/2001/XMLSchema#dateTime" }
+
+                var id_new = 'http://' + (_this.configuration.get('externaladdress') || (hostname + ':' + port + location));
+                new_id = id_new + obs.split(stream_name)[1]
+
+                debug(new_id)
 
                 var element = {
                     "@context": {
@@ -124,8 +134,8 @@ class OBDADataGen extends stream.Readable {
                           }
                     },
                     "http://www.w3.org/ns/prov#generatedAtTime": processingTime,
-                    "http://www.streamreasoning.org/vois#eventTime": eventTime,
-                    "@id": obs,
+                    "http://www.streamreasoning.org/sld#eventTime": eventTime,
+                    "@id": new_id,
                     "@graph": JSON.parse(json)
                 };
    
