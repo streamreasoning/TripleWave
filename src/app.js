@@ -324,6 +324,9 @@ let startUp = function (callback) {
         }else{
             let sgraph = JSON.parse(fs.readFileSync(path.resolve(__dirname, 'rdf/sgraph', configuration.get('sgraph'))).toString());
             sgraph['sld:streamLocation'] = configuration.get('ws_address');
+            sgraph['sld:streamName'] = configuration.get('stream_name');
+            sgraph['sld:runUUID'] = configuration.get('run_uuid');
+
             return res.json(sgraph)
         }
         
