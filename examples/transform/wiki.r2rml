@@ -23,7 +23,7 @@
   rr:predicateObjectMap [ 
     rr:predicate rdf:type; 
     rr:objectMap [ rr:constant schema:UpdateAction]];
-  rr:spredicateObjectMap [ 
+  rr:predicateObjectMap [ 
     rr:predicate obs:result; rr:objectMap [ rr:parentTriplesMap :MeasureDataMap]];
-  rr:psredicateObjectMap [ 
+  rr:predicateObjectMap [ 
     rr:predicate obs:samplingTime; rr:objectMap [ rr:parentTriplesMap :InstantMap]].
