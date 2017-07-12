@@ -8,13 +8,14 @@ path=/TripleWave-transform
 # external address (use in case of proxy)
 externaladdress=131.175.141.249/TripleWave-transform
 
-# triplewave mode
-# transform: transform a web stream in rdf
-# replay: streamify a rdf dataset retrieved from a sparql endpoint
-# endless: similar to the replay, it substitute the original timestamps with the current (need better explaination)
-mode=replay
+#######################
+# Stream distribution #
+#######################
 
-sources=rdfstream
+# Web sockets #
+###############
+
+ws_enabled=true
 
 # endpoint for the websocket
 ws_stream_location=/TripleWave-transform/stream
@@ -22,6 +23,30 @@ ws_port=8124
 
 # where is possobile to connect to the wesbsocket (should match you apache / ngix configuration)
 ws_address=ws://131.175.141.249/TripleWave-transform/stream
+
+# mqtt #
+########
+mqtt_enabled=false
+
+# mqtt connection to broker
+mqtt_broker_address=localhost
+mqtt_broker_port=1883
+
+# mqtt topic 
+mqtt_topic=twave
+
+##########################
+# Streamer configuration #
+##########################
+
+
+# triplewave mode
+# transform: transform a web stream in rdf
+# replay: streamify a rdf dataset retrieved from a sparql endpoint
+# endless: similar to the replay, it substitute the original timestamps with the current (need better explaination)
+mode=replay
+
+sources=rdfstream
 
 rdfstream_file=examples/rdfstream/stream.rs
 

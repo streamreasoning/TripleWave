@@ -1,10 +1,18 @@
 #!/bin/sh
 #. triplewave.properties
- 
+
+echo "  _____    _      _   __      __            "
+echo " |_   _| _(_)_ __| |__\ \    / /_ ___ _____ "
+echo "   | || '_| | '_ \ / -_) \/\/ / _\` \ V / -_)"
+echo "   |_||_| |_| .__/_\___|\_/\_/\__,_|\_/\___|"
+echo "            |_| "
+echo 
+echo " http://streamreasoning.github.io/TripleWave"
+echo
 
 while [[ "$#" > 1 ]]; do case $1 in
-    --configuration) configuration="$2";;
-    *) break;;
+  --configuration) configuration="$2";;
+  *) break;;
   esac; shift; shift
 done
 

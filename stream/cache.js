@@ -64,18 +64,40 @@ Cache.prototype.getAll = function() {
   var cache = {
     "@context": {
       "sld": "http://streamreasoning.org/ontologies/SLD4TripleWave#",
+      "rsd": "http://something/RdfStreamDescription#",
+      "dcat": "http://www.w3.org/ns/dcat#",
       "generatedAt": {
         "@id": "http://www.w3.org/ns/prov#generatedAtTime",
         "@type": "http://www.w3.org/2001/XMLSchema#dateTime"
       }
     },
     "@id": "tr:sGraph",
+    "@type": "rsd:RDFStream",
     "sld:contains": {
       "@list": []
     }
   };
 
-  cache['sld:streamLocation'] = this.configuration.get('ws_address');
+  //DEPRECATED: this line should be dismissed, since SLD is replaced by RSD
+  cache['sld:streamEndpoint']=[];
+  cache['dcat:distribution']=[];
+  if(this.configuration.get('ws_enabled')){
+    //DEPRECATED: this line should be dismissed, since more endpoints are now possible
+    cache['sld:streamLocation'] = this.configuration.get('ws_address');
+    //DEPRECATED: this line should be dismissed, since SLD is replaced by RSD
+    cache['sld:streamEndpoint'].push({'rdf:type':{'@id':'sld:WebSocketStreamEndpoint'},'@id':this.configuration.get('ws_address')});
+    cache['dcat:distribution'].push({'@id':this.configuration.get('ws_address'),'rsd:protocol':'ws','dcat:accessURL':this.configuration.get("ws_address")});
+  }
+  if(this.configuration.get('mqtt_enabled')){
+    //DEPRECATED: this line should be dismissed, since SLD is replaced by RSD
+    cache['sld:streamEndpoint'].push({'rdf:type':{'@id':'sld:MQTTStreamEndpoint'},'@id':'mqtt://' + this.configuration.get('mqtt_broker_address') + ':' + this.configuration.get('mqtt_broker_port'),'sld:mqttTopic':this.configuration.get('mqtt_topic')});
+    cache['dcat:distribution'].push({
+	'@id':'mqtt://'+this.configuration.get('mqtt_broker_address')+':'+this.configuration.get('mqtt_broker_port'),
+	'rsd:protocol':'mqtt',
+	'dcat:accessURL':'mqtt://'+this.configuration.get("mqtt_broker_address")+':'+this.configuration.get('mqtt_broker_port'),
+	'rsd:mqttTopic':this.configuration.get('mqtt_topic')
+	});
+  }
   cache['sld:tBoxLocation'] = {
     "@id": this.configuration.get('tbox_stream_location')
   };

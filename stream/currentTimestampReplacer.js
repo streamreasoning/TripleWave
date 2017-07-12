@@ -8,7 +8,7 @@ class CurrentTimestampReplacer extends stream.Transform {
   }
 
   _transform( data, enc, cb ){
-    data['http://www.w3.org/ns/prov#generatedAtTime'] = moment().format("YYYY-MM-DDTHH:mm:ss.SSSZZ");
+    data['http://www.w3.org/ns/prov#generatedAtTime'] = moment().format("YYYY-MM-DDTHH:mm:ss.SSSZ");
     debug("I am forwarding \n\t", data);
     this.push(data);
     return cb()

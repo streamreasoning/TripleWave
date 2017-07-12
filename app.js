@@ -9,6 +9,7 @@ const program = require('commander');
 
 const Cache = require('./stream/cache');
 const Enricher = require('./stream/enricher');
+const MQTTOut = require('./stream/mqttOutput')
 var configuration;
 
 // TODO: rifarlo con le promise
@@ -241,6 +242,10 @@ let startUp = function (callback) {
         })
     });
 
+    app.get(path+'/', function(req, res) {
+        return res.json(cache.getAll());
+    });
+
     app.get(path+'/sgraph', function (req, res) {
         return res.json(cache.getAll());
     });
@@ -264,34 +269,48 @@ let startUp = function (callback) {
 
     let server = require('http').createServer(app)
 
-    let ws_path = (configuration.get('path') || '') + configuration.get('ws_stream_location');
+    if(configuration.get('mqtt_enabled')){
+        debug('MQTT is enabled, connecting to the broker');
+        let mqttServer = new MQTTOut({
+		    objectMode: true,
+                    configuration: configuration});
+        toUse.pipe(mqttServer);
+    }
 
-    let primus = Primus.createServer({
-        port: configuration.get('ws_port'),
-        transformer: 'websockets',
-        timeout:false,
-        pathname: ws_path
-    });
+    if(configuration.get('ws_enabled')){
+        debug('WS is enabled, setting up the server');
 
-
-    primus.on('initialised', () => {
-        primus.on('connection', (spark) => {
-            debug("Someone connected and I'm starting to provide him data");
-            toUse.pipe(spark);
+	let ws_path = (configuration.get('path') || '') + configuration.get('ws_stream_location');
+        let primus = Primus.createServer({
+            port: configuration.get('ws_port'),
+            transformer: 'websockets',
+	    timeout:false,
+	    pathname: ws_path
         });
 
-        primus.on('disconnection', (spark) => {
-            debug("Someone disconnected and he doesn't deserve my data anymore");
-            toUse.unpipe(spark);
-        });
+	
+        primus.on('initialised', () => {
+            primus.on('connection', (spark) => {
+                debug("Someone connected and I'm starting to provide him data");
+                toUse.pipe(spark);
+            });
 
+            primus.on('disconnection', (spark) => {
+                debug("Someone disconnected and he doesn't deserve my data anymore");
+                toUse.unpipe(spark);
+            });
+
+            app.listen(configuration.get('port'), () => {
+                debug('HTTP and WebSocket servers ready');
+               return callback();
+            })
+        });
+    } else {
         app.listen(configuration.get('port'), () => {
-            debug('HTTP and WebSocket servers ready');
-            return callback();
-        })
-    });
-
-
+           debug('HTTP server ready');
+           return callback();
+        });
+    }
 };
 
 async.series([parseCommandLine, createStreams, startUp], () => {
