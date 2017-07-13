@@ -1,0 +1,90 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!--
+Design by TEMPLATED
+http://templated.co
+Released for free under the Creative Commons Attribution License
+
+Name       : PlainDisplay
+Description: A two-column, fixed-width design with dark color scheme.
+Version    : 1.0
+Released   : 20140309
+
+-->
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>TripleWave - An open-source tool to bring RDF streams on the Web</title>
+	<meta name="keywords" content="" />
+	<meta name="description" content="" />
+	<link href="http://fonts.googleapis.com/css?family=Varela" rel="stylesheet" />
+	<link href="css/default.css" rel="stylesheet" type="text/css" media="all" />
+	<link href="css/fonts.css" rel="stylesheet" type="text/css" media="all" />
+	<link href="css/custom.css" rel="stylesheet" type="text/css" media="all" />
+
+	<script src="lib/jquery-3.2.1.min.js"></script>
+
+	<!--[if IE 6]><link href="default_ie6.css" rel="stylesheet" type="text/css" /><![endif]-->
+
+</head>
+
+<body>
+	<div id="wrapper">
+		<div id="header-wrapper">
+			<!-- loaded by js -->
+		</div>
+		<div id="page" class="container">
+			<div class="title">
+				<h2>Publications and presentations</h2>
+				<span class="byline">You can learn more about TripleWave by having a look at the following resources:</span>
+			</div>
+			<ul class="media-list">
+				<li class="media">Daniele Dell'Aglio: <b>Triplewave: a step towards RDF Stream Processing on the Web</b>. Presentation at the Insight Centre for Data Analytics, Galway, 2016.
+					[<a href="#" onclick="toggleHide('insight-pres')">Show/Hide presentation</a>]
+					<center id="insight-pres" style="display:none">
+						<iframe src="http://www.slideshare.net/slideshow/embed_code/key/NRsKrvbheea1Su" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe>
+					</center>
+				</li>
+				<li class="media">Jean-Paul Calbimonte: <b>Connecting Stream Reasoners on the Web</b>. Presentation at the Stream Reasoning workshop 2016.
+					[<a href="#" onclick="toggleHide('sr-pres')">Show/Hide presentation</a>]
+					<center id="sr-pres" style="display:none">
+						<iframe src="http://www.slideshare.net/slideshow/embed_code/key/nobPCUEBMMXXsS" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe>
+					</center>
+				</li>
+				<li class="media">Andrea Mauri, Jean-Paul Calbimonte, Daniele Dell’Aglio, Marco Balduini, Marco Brambilla, Emanuele Della Valle, Karl Aberer: <b>TripleWave: Spreading RDF Streams on the Web</b>. <a href="https://iswc.lodac.nii.ac.jp/files/resource_62.pdf">Paper</a>	at International Semantic Web Conference 2016.
+					[<a href="#" onclick="toggleHide('iswc2016-pres')">Show/Hide presentation</a>]
+					<center id="iswc2016-pres" style="display:none">
+						<iframe src="https://www.slideshare.net/slideshow/embed_code/key/H7yhrRQPENYQ4j" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe>
+					</center>
+				</li>
+				<li class="media">Andrea Mauri, Jean-Paul Calbimonte, Daniele Dell’Aglio, Marco Balduini, Emanuele Della Valle, Karl Aberer: <b>Where Are the RDF Streams?: On Deploying RDF Streams on the Web of Data with TripleWave</b>. <a href="http://ceur-ws.org/Vol-1486/paper_95.pdf">Poster</a> at International Semantic Web Conference 2015.</li>
+			</ul>
+		</div>
+	</div>
+		<div id="footer" class="container">
+			<!-- loaded by js -->
+		</div>
+</body>
+<script type="text/javascript">
+	$("#header-wrapper").load("includes/header.html", function() {
+		$("#footer").load("includes/footer.html", loaded());
+	});
+	// put your code here if you need to change the footer or the header
+	function loaded() {
+		// resetting the current active element in the list
+		$("#menu ul").children().removeClass("current_page_item");
+		// selecting the correct active element
+		$("#pubs").addClass("current_page_item");
+	}
+
+	function toggleHide(obj) {
+	    var x = document.getElementById(obj);
+	    if (x.style.display === 'none') {
+	        x.style.display = 'block';
+	    } else {
+	        x.style.display = 'none';
+	    }
+	}
+</script>
+
+</html>
