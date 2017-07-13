@@ -1,20 +1,118 @@
----
-layout: default
----
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!--
+Design by TEMPLATED
+http://templated.co
+Released for free under the Creative Commons Attribution License
 
-<nav id='sidebar'>
-	{% include nav.html %}
-</nav>
+Name       : PlainDisplay
+Description: A two-column, fixed-width design with dark color scheme.
+Version    : 1.0
+Released   : 20140309
 
-<section id='content'>
-<h1>TripleWave</h1>
-<h2>An open-source tool to bring RDF streams on the Web</h2>
-{% for post in site.posts %}
-  <article class='{{ post.type }}'>
-    <a name='{{ post.url }}' href='#{{ post.url }}'><h2>{{post.title}}</h2></a>
-    <section class='body'>
-      {{ post.content }}
-    </section>
-  </article>
-{% endfor %}
-</section>
+-->
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>TripleWave - An open-source tool to bring RDF streams on the Web</title>
+    <meta name="keywords" content="" />
+    <meta name="description" content="" />
+    <link href="http://fonts.googleapis.com/css?family=Varela" rel="stylesheet" />
+    <link href="css/default.css" rel="stylesheet" type="text/css" media="all" />
+    <link href="css/fonts.css" rel="stylesheet" type="text/css" media="all" />
+    <link href="css/custom.css" rel="stylesheet" type="text/css" media="all" />
+
+    <!--[if IE 6]><link href="default_ie6.css" rel="stylesheet" type="text/css" /><![endif]-->
+
+</head>
+
+<body>
+    <div id="wrapper">
+        <div id="header-wrapper">
+            <!-- loaded by js -->
+        </div>
+        <div id="extra" class="container">
+            <div class="title">
+                <h2>TripleWave</h2>
+                <span class="byline">An open-source tool to bring RDF streams to the Web</span> </div>
+            <div id="three-column">
+                <div class="boxA">
+                    <div class="box"> <span class="fa fa-cogs"></span>
+                        <p>Lift Web streams as RDF streams</p>
+                    </div>
+                </div>
+                <div class="boxB">
+                    <div class="box"> <span class="fa fa-cogs"></span>
+                        <p>Stream RDF stored in your disk</p>
+                    </div>
+                </div>
+                <div class="boxC">
+                    <div class="box"> <span class="fa fa-cogs"></span>
+                        <p>Highly configurable and extensible</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <p> TripleWave is a reusable and generic tool that enables the publication of <a href="https://www.w3.org/community/rsp/">RDF streams</a> on the Web. It is independent of any specific engine implementation, and it can be fed with existing Web streams (e.g. Twitter and Wikipedia streams) or time-annotated RDF datasets (e.g. the Linked Sensor Data dataset). It can be invoked through both pull- and push-based mechanisms, thus enabling RSP engines to automatically register and receive data from TripleWave.</p>
+        </div>
+        <!--
+	<ul class="actions">
+		<li><a href="https://github.com/streamreasoning/TripleWave" class="button">Find it on Github</a></li>
+	</ul>
+-->
+        <div class="container">
+            <div class="title">
+                <div class="byline-left">Download</div>
+            </div>
+            <p>TripleWave is available in <a href="https://github.com/streamreasoning/TripleWave">Github</a>. Instructions about how to install and configure it are available in the <a href="docs.html">documentation</a> page. You can find additional material, such as publications and presentations, in the <a href="publications.html">resource</a> page.</p>
+        </div>
+
+        <div class="container">
+            <div class="title">
+                <div class="byline-left">Licence and Credits</div>
+            </div>
+            <p>TripleWave is open source, under Apache 2.0 licence</p>
+            <p>TripleWave was born as a collaboration between <a href="http://www.polimi.it/">Politecnico di Milano</a> and <a href="https://www.epfl.ch/index.en.html">École polytechnique fédérale de Lausanne</a>a. Now the project is maintained by Politecnico di Milano, the <a href="http://www.uzh.ch/index_en.html">University of Zurich</a> and <a href="http://www.hevs.ch">the University of Applied Sciences Western Switzerland HES-SO Valais-Wallis</a>. Check here the list of <a href="people.html">contributors</a>.</p>
+            <div style="display:table; width: 1000px">
+            <ul style="display:table-row">
+                <li style="display: table-cell"><img src="img/polimi.png" width="100pt"/></li>
+                <li style="display: table-cell"><img src="img/uzh.png" width="100pt"/></li>
+                <li style="display: table-cell; vertical-align: middle"><img src="img/hes-so.png" width="200pt"/></li>
+            </ul>
+            </div>
+            
+            
+            </div>
+        </div>
+        <!--
+	<div id="featured">
+		<div class="container">
+			<div class="title">
+				<h2>Fusce ultrices fringilla metus</h2>
+				<span class="byline">Donec leo, vivamus fermentum nibh in augue praesent a lacus at urna congue</span> </div>
+			<p>This is <strong>PlainDisplay</strong>, a free, fully standards-compliant CSS template designed by <a href="http://templated.co" rel="nofollow">TEMPLATED</a>. The photos in this template are from <a href="http://fotogrph.com/"> Fotogrph</a>. This free template is released under the <a href="http://templated.co/license">Creative Commons Attribution</a> license, so you're pretty much free to do whatever you want with it (even use it commercially) provided you give us credit for it. Have fun :) </p>
+		</div>
+		<ul class="actions">
+			<li><a href="#" class="button">Etiam posuere</a></li>
+		</ul>
+	</div>
+	<div id="page" class="container">
+		<div class="title">
+			<h2>Nulla luctus eleifend</h2>
+			<span class="byline">Lorem ipsum dolor sit amet, consectetuer adipiscing elit</span> </div>
+		<p> Vivamus fermentum nibh in augue. Praesent a lacus at urna congue rutrum. Nulla enim eros nibh. Duis enim nulla, luctus eu, dapibus lacinia, venenatis id, quam. Vestibulum imperdiet, magna nec eleifend rutrum, nunc lectus vestibulum velit, euismod lacinia quam nisl id lorem. Quisque erat. Vestibulum pellentesque, justo mollis pretium suscipit, justo nulla blandit libero, in blandit augue justo quis nisl. Fusce mattis viverra elit. Fusce quis tortor.</p>
+		<ul class="actions">
+			<li><a href="#" class="button">Etiam posuere</a></li>
+		</ul>
+	</div>
+-->
+    </div>
+    <div id="footer" class="container">
+        <!-- loaded by js -->
+    </div>
+</body>
+<script src="lib/jquery-3.2.1.min.js"></script>
+<script src="js/index.js"></script>
+
+</html>
