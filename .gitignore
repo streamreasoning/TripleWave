@@ -1,1 +1,7 @@
-Running_Examples/
+#Visual code project file
+.vscode
+
+#Mac stuff
+.DS_Store
+
+

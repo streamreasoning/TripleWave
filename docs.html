@@ -1,0 +1,489 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!--
+Design by TEMPLATED
+http://templated.co
+Released for free under the Creative Commons Attribution License
+
+Name       : PlainDisplay
+Description: A two-column, fixed-width design with dark color scheme.
+Version    : 1.0
+Released   : 20140309
+
+-->
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>TripleWave - An open-source tool to bring RDF streams to the Web</title>
+    <meta name="keywords" content="" />
+    <meta name="description" content="" />
+    <link href="http://fonts.googleapis.com/css?family=Varela" rel="stylesheet" />
+    <link href="css/default.css" rel="stylesheet" type="text/css" media="all" />
+    <link href="css/fonts.css" rel="stylesheet" type="text/css" media="all" />
+    <link href="css/custom.css" rel="stylesheet" type="text/css" media="all" />
+
+    <script src="lib/jquery-3.2.1.min.js"></script>
+
+    <!--[if IE 6]><link href="default_ie6.css" rel="stylesheet" type="text/css" /><![endif]-->
+
+</head>
+
+<body>
+    <div id="wrapper">
+        <div id="header-wrapper">
+            <!-- loaded by js -->
+        </div>
+        <div id="page" class="container">
+            <div class="title">
+                <h2>Documentation</h2>
+                <span class="byline">You can learn how to use TripleWave:</span>
+            </div>
+        </div>
+        <div class="container">
+            <p>The configuration of TripleWave is controlled through the config.properties file, stored inside the config folder. TripleWave accepts a wide range of configuration parameters, depending on the type of usage. We can broadly group them in three categories: general, input and output. The rest of the page goes into the details according to the following outline:</p>
+            <ul>
+                <li><a href="#inst">Installation</a></li>
+                <li><a href="#config">General configuration</a></li>
+                <li>Input:
+                    <ul>
+                        <li><a href="#webstream">Convert a Web stream</a></li>
+                        <li><a href="#rdf">Stream your own RDF data</a></li>
+                        <li><a href="#rdfstream">Restream your RDF stream</a></li>
+                    </ul>
+                </li>
+                <li>Output:</li>
+                <ul>
+                    <li><a href="#WebSocket">Web socket</a></li>
+                    <li><a href="#mqtt">MQTT</a></li>
+                </ul>
+                </li>
+                <li><a href="#consume">Consume RDF streams</a></li>
+            </ul>
+
+            <h3 id="install">Installation</h3>
+            <h4 id="requirements">Requirements</h4>
+            <ul>
+                <li>NodeJS &gt; 6.0.0</li>
+                <li>Java 8 (for fuseki, theoretically you can ignore this if you plan to use only the transform mode)</li>
+            </ul>
+
+            <p>In order to install TripleWave just clone the repository</p>
+
+            <div class="highlighter-rouge">
+                <pre class="highlight"><code>git clone https://github.com/streamreasoning/TripleWave.git</code></pre>
+            </div>
+
+            <p>Then simply run</p>
+
+            <div class="highlighter-rouge">
+                <pre class="highlight"><code>npm install</code></pre>
+            </div>
+
+            <p>for installing the node dependencies.</p>
+
+            <h4 id="possible-bugs">Possible bugs</h4>
+
+            <ul>
+                <li>While installing the dependency <code class="highlighter-rouge">node-icu-charset-detector</code> you could see ../node-icu-charset-detector.cpp:5:10: fatal error: ‘unicode/ucsdet.h’ file not found (tested on OSX 10.10), see <a href="https://github.com/mooz/node-icu-charset-detector/issues/5">here</a></li>
+                <li>While installing the dependency <code class="highlighter-rouge">node-iconv</code> you could see ../node_modules/nan/nan.h:601:20: error: no type named ‘GCPrologueCallback’ in ‘v8::Isolate’(tested on 10.10), please ignore..</li>
+            </ul>
+
+            <h3 id="config">General configuration</h3>
+            <p>These parameters set information about the instance of TripleWave, such as hostname, path and port.</p>
+            <!--
+        # triplewave port
+        port=8114
+# host
+hostname=localhost
+# root path
+path=/tw
+
+# external address (use in case of proxy)
+externaladdress=131.175.141.249/TripleWave-transform
+
+tbox_stream_location=http://purl.oclc.org/NET/ssnx/ssn
+-->
+            <h3>Input</h3>
+            <h4 id="webstream">Convert a Web stream</h4>
+            <p>TripleWave allows to generate an RDF stream from an existing stream from the Web. As an example, consider the change stream of <a href="https://en.wikipedia.org/wiki/Special:RecentChanges">Wikipedia</a>. This stream features all the changes that occur on the Wikipedia website. It comprehends not only elements related to the creation or modification of pages (e.g., articles and books), but also events related to users (new registrations and blocked users), and discussions among them.</p>
+
+            <p>For example the following JSON excerpt (collected with the API provided <a href="https://github.com/edsu/wikistream">here</a>) shows a fragment of the stream of changes of Wikipedia. In particular, it shows that the user <code class="highlighter-rouge">Jmorrison230582</code> modified an article of the English Wikipedia about <code class="highlighter-rouge">Naruto: Ultimate Ninja</code>. Furthermore, the delta attribute tell us that the user deleted some words, and the <code class="highlighter-rouge">url</code> attribute refers the to the Wikipedia page that describes the event.</p>
+
+            <div class="highlighter-rouge">
+                <pre class="highlight"><code><span class="p">{</span><span class="w">
+</span><span class="nt">"page"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Naruto: Ultimate Ninja"</span><span class="p">,</span><span class="w">
+</span><span class="nt">"pageUrl"</span><span class="p">:</span><span class="w"> </span><span class="s2">"http://en.wikipedia.org/wiki/Naruto:_Ultimate_Ninja"</span><span class="p">,</span><span class="w">
+</span><span class="nt">"url"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://en.wikipedia.org/w/index.php?diff=669355471&amp;oldid=669215360"</span><span class="p">,</span><span class="w">
+</span><span class="nt">"delta"</span><span class="p">:</span><span class="w"> </span><span class="mi">-7</span><span class="p">,</span><span class="w"> </span><span class="nt">"comment"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/ Characters /"</span><span class="p">,</span><span class="w">
+</span><span class="nt">"wikipediaUrl"</span><span class="p">:</span><span class="w"> </span><span class="s2">"http://en.wikipedia.org"</span><span class="p">,</span><span class="w">
+</span><span class="nt">"channel"</span><span class="p">:</span><span class="w"> </span><span class="s2">"#en.wikipedia"</span><span class="p">,</span><span class="w">
+</span><span class="nt">"wikipediaShort"</span><span class="p">:</span><span class="w"> </span><span class="s2">"en"</span><span class="p">,</span><span class="w">
+</span><span class="nt">"user"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Jmorrison230582"</span><span class="p">,</span><span class="w">
+</span><span class="nt">"userUrl"</span><span class="p">:</span><span class="w"> </span><span class="s2">"http://en.wikipedia.org/wiki/User/Jmorrison230582"</span><span class="p">,</span><span class="w">
+</span><span class="nt">"unpatrolled"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+</span><span class="nt">"newPage"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+</span><span class="nt">"robot"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+</span><span class="nt">"namespace"</span><span class="p">:</span><span class="w"> </span><span class="s2">"article"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+            </div>
+
+            <p>In order to transform a web stream you need two components:</p>
+
+            <ul>
+                <li>A connector to the web stream</li>
+                <li>A R2RML tranformation</li>
+            </ul>
+
+            <h5 id="web-stream-connector">Web Stream Connector</h5>
+
+            <p>A Web Stream connector is a Javascript file that needs to transform data retrieved from some web API to a NodeJS stream.</p>
+
+            <p>Basically what you need to do is to implement a <a href="https://nodejs.org/api/stream.html#stream_class_stream_transform">Transform Stream</a> (a Readable stream is fine too)</p>
+
+            <p>Let’s have a look at the Wikipedia example:</p>
+
+            <div class="highlighter-rouge">
+                <pre class="highlight"><code>var stream = require('stream');
+var util = require('util');
+var wikichanges = require("wikichanges");
+
+var Transform = stream.Transform || require('readable-stream').Transform;
+
+function WikiStream(options) {
+// allow use without new
+if (!(this instanceof WikiStream)) {
+return new WikiStream(options);
+}
+
+this.close = false;
+this.w = new wikichanges.WikiChanges({
+ircNickname: "jsonLDBot",
+wikipedias: ["#en.wikipedia"]
+});
+_this = this;
+
+this.w.listen(function(c) {
+if (!_this.close) {
+_this.push(JSON.stringify(c));
+} else {
+_this.push(null);
+}
+});
+
+// init Transform
+Transform.call(this, options);
+}
+
+util.inherits(WikiStream, Transform);
+
+WikiStream.prototype._read = function(enc, cb) {};
+
+WikiStream.prototype.closeStream = function() {
+this.close = true;
+};
+exports = module.exports = WikiStream;
+</code></pre>
+            </div>
+
+            <p>The lines <code class="highlighter-rouge">var stream = require('stream'); var util = require('util');</code> are needed for requiring the stream module and the util module that is needed to implement the inheritance</p>
+
+            <p>Then, <code class="highlighter-rouge">var Transform = stream.Transform || require('readable-stream').Transform;</code> requires the actual Transform stream class</p>
+
+            <p>Then all the logic is implemented inside the <code class="highlighter-rouge">WikiStream</code> function</p>
+
+            <p>Whenever you want to put some data in the stream you need to call the `this.push(/* some data*/) function (remember that in the stream you can pass only strings)</p>
+
+            <p>In this particular example the code works like this:</p>
+
+            <p><code class="highlighter-rouge">var wikichanges = require("wikichanges");</code> requires the library to connect to the stream of changes of wikipedia</p>
+
+            <p>The code</p>
+
+            <div class="highlighter-rouge">
+                <pre class="highlight"><code>this.w = new wikichanges.WikiChanges({
+ircNickname: "jsonLDBot",
+wikipedias: ["#en.wikipedia"]
+});
+</code></pre>
+            </div>
+
+            <p>opens the stream.</p>
+
+            <p>Then with the lines</p>
+
+            <div class="highlighter-rouge">
+                <pre class="highlight"><code>this.w.listen(function(c) {
+if (!_this.close) {
+_this.push(JSON.stringify(c));
+} else {
+_this.push(null);
+}
+});
+</code></pre>
+            </div>
+
+            <p>we create a handler that put the data in our stream whenever they are available from Wikipedia</p>
+
+            <p>In order to use a custom stream you need to put your file in the <code class="highlighter-rouge">stream/input_stream</code> folder, and then set the <code class="highlighter-rouge">stream_name</code> parameter in the configuration file equal to the name of your .js file</p>
+
+            <p>Furthermore you can use the <code class="highlighter-rouge">SampleStream.js</code> file as a stub to create your own connector.</p>
+
+            <h5 id="r2rml-transformation">R2RML Transformation</h5>
+
+            <p>To adapt and transform Web streams to RDF streams we use a generic transformation process that is specified as <a href="http://www.w3.org/TR/r2rml/">R2RML</a> mappings. The example below specifies how a Wikipedia stream update can be mapped to a graph of an RDF stream. This mapping defines first a triple that indicates that the generated subject is of type <code class="highlighter-rouge">schema:UpdateAction</code>. The <code class="highlighter-rouge">predicateObjectMap</code> clauses add two more triples, one specifying the object of the update (e.g. the modified wiki page) and the author of the update.</p>
+
+            <div class="highlighter-rouge">
+                <pre class="highlight"><code>:wikiUpdateMap a rr:TriplesMap; rr:logicalTable :wikistream;
+rr:subjectMap [ rr:template "http://131.175.141.249/TripleWave/{time}";
+          rr:class schema:UpdateAction; rr:graphMap :streamGraph ];
+rr:predicateObjectMap [rr:predicate schema:object;
+                 rr:objectMap [ rr:column "pageUrl" ]];
+rr:predicateObjectMap [rr:predicate schema:agent;
+                 rr:objectMap [ rr:column "userUrl"] ];.
+</code></pre>
+            </div>
+
+            <p>Additional mappings can be specified, as in the example below, for providing more information about the user (e.g. user name):</p>
+
+            <div class="highlighter-rouge">
+                <pre class="highlight"><code> :wikiUserMap a rr:TriplesMap; rr:logicalTable :wikistream;
+rr:subjectMap   [ rr:column "userUrl";
+        rr:class schema:Person; rr:graphMap :streamGraph ];
+rr:predicateObjectMap [ rr:predicate schema:name;
+                   rr:objectMap [ rr:column "user" ]];.
+</code></pre>
+            </div>
+
+            <p>A snippet of the resulting RDF Stream graph, serialized in JSON-LD, is shown below.</p>
+
+            <div class="highlighter-rouge">
+                <pre class="highlight"><code><span class="p">{</span><span class="nt">"http://www.w3.org/ns/prov#generatedAtTime"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2015-06-30T16:44:59.587Z"</span><span class="p">,</span><span class="w">
+</span><span class="nt">"@id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"http://131.175.141.249/TripleWave/1435682699587"</span><span class="p">,</span><span class="w">
+</span><span class="nt">"@graph"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+</span><span class="p">{</span><span class="w"> </span><span class="nt">"@id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"http://en.wikipedia.org/wiki/User:Jmorrison230582"</span><span class="p">,</span><span class="w">
+</span><span class="nt">"@type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://schema.org/Person"</span><span class="p">,</span><span class="w">
+</span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Jmorrison230582"</span><span class="w"> </span><span class="p">},</span><span class="w">
+</span><span class="p">{</span><span class="w"> </span><span class="nt">"@id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"http://131.175.141.249/TripleWave/1435682699587"</span><span class="p">,</span><span class="w">
+</span><span class="nt">"@type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://schema.org/UpdateAction"</span><span class="p">,</span><span class="w">
+</span><span class="nt">"object"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">"@id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"http://en.wikipedia.org/wiki/Naruto_Ultimate_Ninja"</span><span class="p">},</span><span class="w">
+</span><span class="nt">"agent"</span><span class="p">:</span><span class="w">  </span><span class="p">{</span><span class="nt">"@id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"http://en.wikipedia.org/wiki/User:Jmorrison230582"</span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span><span class="p">],</span><span class="w">
+</span><span class="nt">"@context"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://schema.org/"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+            </div>
+
+            <p>In order to use your transformation you need to put the R2RML file in the <code class="highlighter-rouge">transformation</code> folder and set the <code class="highlighter-rouge">stream_mapping</code> parameter as the name of the transformation file.
+            </p>
+
+
+            <h4 id="rdf">Stream your own RDF data</h4>
+            <p>TripleWave can convert an existing dataset (containing some temporal information) in an RDF stream and can stream it out. In the following, we explain how to configure TripleWave in order to work in this setting.</p>
+
+            <h5 id="set-the-execution-mode-and-the-input-file">Set the execution mode and the input file</h5>
+
+            <p>In order to stream your own RDF file, you should first set one of the two execution modes in the <code class="highlighter-rouge">mode</code> parameter of the configuration file.</p>
+
+            <ul>
+                <li>Replay</li>
+                <li>Endless</li>
+            </ul>
+
+            <p>Moreover, you should set the file location of the RDF file to be converted. It can be done by filling the field <code class="highlighter-rouge">rdf_file</code> in the config file, e.g.,</p>
+
+            <div class="highlighter-rouge">
+                <pre class="highlight"><code>rdf_file=../rdf/data.ttl</code></pre>
+            </div>
+
+            <h5 id="create-the-stream-item-structure">Create the stream item structure</h5>
+
+            <p>The first conversion step consists in specifying how to create the RDF stream items, i.e., a set of pairs <em>(g,t)</em> where <em>g</em> denotes an RDF graph and <em>t</em> a time stamp.</p>
+
+            <p>Being the file imported an RDF graph, i.e., a set of triples, it is necessary to specify the criteria to (1) group the data in RDF graphs and (2) associate a time instant to each of them. It is done through the following parametric SPARQL query:
+            </p>
+
+            <div class="highlighter-rouge">
+                <pre class="highlight"><code>PREFIX sr: &lt;http://streamreasoning.org/&gt;
+        WITH sr:sgraph
+        INSERT{
+          ?g prov:generatedAt ?ts ; sr:hasKey ?key
+        }
+        WHERE {
+          GRAPH sr:input{
+          [rdf_stream_item_pattern]
+          BIND (iri(concat("http://streamreasoning.org/igraph/",afn:localname(?key))) AS ?g)
+          }
+        }
+        </code></pre>
+            </div>
+
+            <p>The above query is dependent on the input data and this fact is captured by the [rdf_stream_item_pattern] parameter. It is necessary to set through the <code class="highlighter-rouge">rdf_stream_item_pattern</code> parameter in the config file the value with the following constraints:</p>
+
+            <ul>
+                <li>it is a Basic Graph pattern;</li>
+                <li>it uses two special variables <em>?key</em> and <em>?ts</em> to set respectively the resource used to partition the data and the relative timestamp;</li>
+                <li>there is a 1:1 relation between <em>?key</em> and <em>?ts</em>, i.e., for each value of <em>?key</em> there is exactly one <em>?ts</em> value (and vice versa).</li>
+            </ul>
+
+            <p>TripleWave assumes that the three constraints are verified, otherwise it may not behave properly. With reference to the supplied example file data.ttl, the <code class="highlighter-rouge">stream_item_pattern</code> parameter can be set as (
+                <strong>in one line</strong>):</p>
+
+            <div class="highlighter-rouge">
+                <pre class="highlight"><code>rdf_stream_item_pattern =
+          ?key &lt;http://knoesis.wright.edu/ssw/ont/sensor-observation.owl#samplingTime&gt; ?time .
+          ?time &lt;http://www.w3.org/2006/time#inXSDDateTime&gt; ?ts
+        </code></pre>
+            </div>
+
+            <p>Consequently, the following query is executed over the input data</p>
+
+            <div class="highlighter-rouge">
+                <pre class="highlight"><code>PREFIX sr: &lt;http://streamreasoning.org/&gt;
+        WITH sr:sgraph
+        INSERT{
+          ?g prov:generatedAt ?ts ; sr:hasKey ?key
+        }
+        WHERE {
+          GRAPH sr:input{
+           ?key &lt;http://knoesis.wright.edu/ssw/ont/sensor-observation.owl#samplingTime&gt; ?time .
+           ?time &lt;http://www.w3.org/2006/time#inXSDDateTime&gt; ?ts
+           BIND (iri(concat("http://streamreasoning.org/igraph/",afn:localname(?key)))  AS ?g)
+          }
+        }
+        </code></pre>
+            </div>
+
+            <h5 id="fill-the-stream-items">Fill the stream items</h5>
+            <p>The previous step creates the stream item structure, with element names and relative time instants. To complete the conversion, it is necessary to fill the stream elements with their content. This operation is done with a set of SPARQL queries in the form:</p>
+
+            <div class="highlighter-rouge">
+                <pre class="highlight"><code>PREFIX sr: &lt;http://streamreasoning.org/&gt;
+        WITH [g]
+        INSERT{
+          [stream_item_content_pattern]
+        }
+        WHERE {
+            GRAPH sr:input{
+                [stream_item_content_pattern]
+            }
+        }
+        </code></pre>
+            </div>
+
+            <p>[g] denotes a stream element identifier, while [stream_item_content_pattern] indicates the Basic Graph Pattern that extracts the window content.</p>
+
+            <p>[g] is automatically set by the TripleWave, while [stream_item_content_pattern] is loaded by the config file. That means, you should set the [stream_item_content_pattern] value through the
+                <code class="highlighter-rouge">stream_item_content_pattern</code> parameter. As before, the special variable <em>?key</em> has to be used to compose the basic graph pattern.</p>
+
+            <p>Continuing the example, <code class="highlighter-rouge">stream_item_content_pattern</code> parameter can be set as:</p>
+
+            <div class="highlighter-rouge">
+                <pre class="highlight"><code>rdf_stream_item_pattern =
+          ?key ?p ?o.
+        </code></pre>
+            </div>
+
+            <p>Consequently, the following example query is executed over the input data</p>
+
+            <div class="highlighter-rouge">
+                <pre class="highlight"><code>PREFIX sr: &lt;http://streamreasoning.org/&gt;
+        WITH &lt;http://example.org/data.ttl#item05&gt;
+        INSERT{
+            &lt;http://example.org/data.ttl#key5&gt; ?p ?o.
+        }
+        WHERE {
+            GRAPH sr:input{
+                &lt;http://example.org/data.ttl#key5&gt; ?p ?o.
+            }
+        }
+        </code></pre>
+            </div>
+
+            <p>It is worth noting that TripleWave automatically replace the ?key variable with the value related to the graph it has to be created.</p>
+
+            <h4 id="rdfstream">Restream your own RDF stream</h4>
+            <p>If the RDF stream is already serialized in JSON-LD according to the TripleWave schema (i.e. a sequence of graphs representing the events and described in the default graph), TripleWave can replay it. It can be enabled by setting
+                <div class="highlighter-rouge">
+                    <pre class="highlight"><code>sources=rdfstream</code></pre>
+                </div>
+                and specifying the location of the RDF stream as follows:
+                <div class="highlighter-rouge">
+                    <pre class="highlight"><code>rdfstream_file=examples/rdfstream/stream.rs</code></pre>
+                </div>
+            </p>
+            <p>It is possible to used both replay and endless modes.</p>
+            <h3>Output</h3>
+            <h4 id="WebSocket">WebSocket</h4>
+            <p>WebSocket is a protocol to enable full-duplex communication. TripleWave implements a publish/subscribe mechanism based on this protocol, which can be enabled by setting
+                <div class="highlighter-rouge">
+                    <pre class="highlight"><code>ws_enabled=true</code></pre>
+                </div>
+            </p>
+
+            <p>Additional parameters are required to configure the WebSocket address:
+                <div class="highlighter-rouge">
+                    <pre class="highlight"><code>ws_stream_location=/stream
+ws_port=8124
+ws_address=ws://localhost:8124/tw/stream</code></pre>
+                </div>
+
+                <h4 id="mqtt">MQTT</h4>
+                <p><a href="http://mqtt.org/">MQTT</a> is a protocol to exchange data in the Internet of Things. It is a publish/subscribe protocol mediated by a broker. Several MQTT brokers are available; we tested TripleWave in this mode with <a href="https://mosquitto.org/">Mosquitto</a>.</p>
+                <p>MQTT in TripleWave can be enabled by setting
+                    <div class="highlighter-rouge">
+                        <pre class="highlight"><code>mqtt_enabled=true</code></pre>
+                    </div>
+                </p>
+
+                <p>When MQTT is enabled, TripleWave expects a set of additional parameters associated to the broker. In particular, it requires the address and the port of the MQTT broker, and the topic where to send the messages:
+                    <div class="highlighter-rouge">
+                        <pre class="highlight"><code>mqtt_broker_address=localhost
+mqtt_broker_port=1883
+mqtt_topic=twave</code></pre>
+                    </div>
+                </p>
+
+                <h3 id="consume">Consume RDF streams</h3>
+                <h4 id="rsp-service">RSP service interfaces</h4>
+
+                <p>The user can consume a triple wave stream by exploiting RSP services interfaces. The RSP services offers simple HTTP call to interact with an RSP and register stream, register query and consume results. The user can interact with RSP (in this we exemplify the operation flow using the C-SPARQL engine) and consume the stream as follow:</p>
+
+                <ul>
+                    <li>Identifies the stream by its IRI of the stream (which is the URL of the sGraph)</li>
+                    <li>Register the new stream in the C-SPARQL engine using an HTTP PUT Call (<code class="highlighter-rouge">&lt;serveraddress&gt;/streams</code>) to the RSP Sevices interfaces with the parameter <code class="highlighter-rouge">streamIRI</code> in the body (it represents the unique ID of the stream in the engine).</li>
+                    <li>RSP Services looks at the sGraph URL, parses it and gets the information regarding the TBox and WebSocket</li>
+                    <li>The TBox (if available) is associated to the stream.</li>
+                    <li>A WebSocket connection is established and the data flows into C-SPARQL</li>
+                    <li>Register a new query for the registered stream using an HTTP PUT call <code class="highlighter-rouge">&lt;serveraddress&gt;/streams/&lt;queryName&gt;</code> with the query in the body as raw string</li>
+                    <li>The TBox is loaded into the reasoner (if available) associated to the query</li>
+                    <li>The query is performed on the flowing data.</li>
+                </ul>
+
+                <p><a href="http://streamreasoning.org/TripleWave/Running_Examples.zip">Here</a> is available a compressed file containing running examples that exploit online RDF streams created with TripleWave and the C-SPARQL Engine (via RSP Services).</p>
+
+                <p>The source code of the RSP Services can be found on <a href="http://github.com/streamreasoning/rsp-services-client-example/tree/triplewave">github</a>.</p>
+
+                <p>The source code of the running examples client can be found on <a href="http://github.com/streamreasoning/rsp-services-csparql">github</a>.</p>
+        </div>
+    </div>
+    <div id="footer" class="container">
+        <!-- loaded by js -->
+    </div>
+</body>
+<script type="text/javascript">
+    $("#header-wrapper").load("includes/header.html", function() {
+        $("#footer").load("includes/footer.html", loaded());
+    });
+    // put your code here if you need to change the footer or the header
+    function loaded() {
+        // resetting the current active element in the list
+        $("#menu ul").children().removeClass("current_page_item");
+        // selecting the correct active element
+        $("#tutorial").addClass("current_page_item");
+    }
+
+</script>
+
+</html>

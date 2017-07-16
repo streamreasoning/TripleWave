@@ -1,0 +1,74 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!--
+Design by TEMPLATED
+http://templated.co
+Released for free under the Creative Commons Attribution License
+
+Name       : PlainDisplay
+Description: A two-column, fixed-width design with dark color scheme.
+Version    : 1.0
+Released   : 20140309
+
+-->
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>TripleWave - An open-source tool to bring RDF streams on the Web</title>
+	<meta name="keywords" content="" />
+	<meta name="description" content="" />
+	<link href="http://fonts.googleapis.com/css?family=Varela" rel="stylesheet" />
+	<link href="css/default.css" rel="stylesheet" type="text/css" media="all" />
+	<link href="css/fonts.css" rel="stylesheet" type="text/css" media="all" />
+	<link href="css/custom.css" rel="stylesheet" type="text/css" media="all" />
+
+	<script src="lib/jquery-3.2.1.min.js"></script>
+
+	<!--[if IE 6]><link href="default_ie6.css" rel="stylesheet" type="text/css" /><![endif]-->
+
+</head>
+
+<body>
+	<div id="wrapper">
+		<div id="header-wrapper">
+			<!-- loaded by js -->
+		</div>
+		<div class="container">
+			<div class="title">
+				<h2>Demo</h2>
+				<span class="byline">You can play with TripleWave with the following demos:</span> </div>
+			<h3>Wikipedia update stream</h3>
+			<p> lorem ipsum</p>
+			<ul class="actions">
+				<li><a href="#" class="button">Etiam posuere</a></li>
+			</ul>
+			<h3>Wikipedia update stream</h3>
+			<p> lorem ipsum</p>
+			<ul class="actions">
+				<li><a href="#" class="button">Etiam posuere</a></li>
+			</ul>
+			<h3>Wikipedia update stream</h3>
+			<p> lorem ipsum</p>
+			<ul class="actions">
+				<li><a href="#" class="button">Etiam posuere</a></li>
+			</ul>
+		</div>
+	</div>
+	<div id="footer" class="container">
+		<!-- loaded by js -->
+	</div>
+</body>
+<script type="text/javascript">
+	$("#header-wrapper").load("includes/header.html", function() {
+		$("#footer").load("includes/footer.html", loaded());
+	});
+	// put your code here if you need to change the footer or the header
+	function loaded() {
+		// resetting the current active element in the list
+		$("#menu ul").children().removeClass("current_page_item");
+		// selecting the correct active element
+		$("#demo").addClass("current_page_item");
+	}
+</script>
+
+</html>
