@@ -19,6 +19,6 @@ function SampleStream(options) {
 }
 util.inherits(SampleStream, Transform);
 
-WikiStream.prototype._read = function(enc, cb) {};
+SampleStream.prototype._read = function(enc, cb) {};
 
 exports = module.exports = SampleStream;
