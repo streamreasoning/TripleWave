@@ -5,8 +5,8 @@ var Transform = stream.Transform || require('readable-stream').Transform;
 
 function SampleStream(options) {
   // allow use without new
-  if (!(this instanceof WikiStream)) {
-    return new WikiStream(options);
+  if (!(this instanceof SampleStream)) {
+    return new SampleStream(options);
   }
 
  //Insert stream logic here
