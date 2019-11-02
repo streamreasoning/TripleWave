@@ -30,7 +30,7 @@
     "underscore.string": "^3.3.4",
     "when": "^3.7.7",
     "wikichanges": "github:janez87/wikichanges",
-    "ws": "^1.1.0"
+    "ws": "^7.2.0"
   },
   "devDependencies": {},
   "scripts": {
